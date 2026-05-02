@@ -1,0 +1,52 @@
+{
+  "intents": {
+    "greeting": {
+      "patterns": ["hello", "hi", "hey", "good morning", "good afternoon", "good evening"],
+      "responses": [
+        "Hello! How can I help you learn today?",
+        "Hi there! Ready to learn something new?",
+        "Greetings! What would you like to explore?"
+      ]
+    },
+    "farewell": {
+      "patterns": ["bye", "goodbye", "see you", "later", "take care"],
+      "responses": [
+        "Goodbye! Keep learning!",
+        "See you next time!",
+        "Take care and keep shining!"
+      ]
+    },
+    "thanks": {
+      "patterns": ["thank you", "thanks", "appreciate it"],
+      "responses": [
+        "You're welcome!",
+        "Happy to help!",
+        "Anytime!"
+      ]
+    },
+    "courses": {
+      "patterns": ["courses", "subjects", "what can I learn", "available courses"],
+      "responses": [
+        "We offer Mathematics, English, and General Knowledge courses. Which interests you?"
+      ]
+    },
+    "help": {
+      "patterns": ["help", "what can you do", "how to use", "support"],
+      "responses": [
+        "I can help with courses, games, assessments, and learning tips. What do you need?"
+      ]
+    }
+  },
+  "learning_tips": [
+    "Take short breaks every 15-20 minutes to stay focused.",
+    "Use colorful notes to remember important information.",
+    "Read aloud to improve comprehension.",
+    "Practice regularly - even 10 minutes a day helps!"
+  ],
+  "fun_facts": [
+    "The Eiffel Tower can grow 6 inches in summer due to heat expansion!",
+    "A day on Venus is longer than a year on Venus.",
+    "Octopuses have three hearts.",
+    "Honey never spoils - it can last forever!"
+  ]
+}

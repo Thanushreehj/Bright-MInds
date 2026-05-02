@@ -1,0 +1,31 @@
+
+
+version: '3.8'
+
+services:
+  bright-minds-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app/backend
+      - model-cache:/app/backend/models
+    environment:
+      - FLASK_ENV=production
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+
+  bright-minds-frontend:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html
+    depends_on:
+      - bright-minds-backend
+    restart: unless-stopped
+
+volumes:
+  model-cache:

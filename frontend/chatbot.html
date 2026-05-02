@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tutor – Bright Minds (Powered by AI)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { background: var(--bg); margin: 0; padding: 0; }
+        .chat-layout { display: grid; grid-template-columns: 280px 1fr; height: calc(100vh - 65px); }
+
+        /* Sidebar */
+        .chat-sidebar {
+            background: white;
+            border-right: 2px solid var(--border);
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .sidebar-title { font-family: var(--font-display); font-weight: 800; font-size: 0.95rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; }
+        .quick-chip {
+            display: block;
+            width: 100%;
+            padding: 0.65rem 0.9rem;
+            margin-bottom: 0.5rem;
+            border-radius: 10px;
+            border: 2px solid var(--border);
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            background: white;
+            text-align: left;
+            color: var(--text);
+            transition: all 0.2s;
+        }
+        .quick-chip:hover { background: var(--primary); color: white; border-color: var(--primary); transform: translateX(4px); }
+        
+        .mood-section { margin-top: 1rem; }
+        .mood-label { font-size: 0.82rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.7rem; display: block; }
+        .mood-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; }
+        .mood-btn {
+            padding: 0.5rem;
+            border-radius: 10px;
+            border: 2px solid var(--border);
+            background: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .mood-btn:hover, .mood-btn.selected { background: var(--primary); border-color: var(--primary); transform: scale(1.1); }
+        
+        .ai-status { margin-top: auto; padding: 0.9rem; background: #F3F0FF; border-radius: 12px; }
+        .ai-status-title { font-size: 0.82rem; font-weight: 800; color: var(--primary); margin-bottom: 0.5rem; }
+        .ai-stat-row { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.3rem; }
+        .ai-stat-val { color: var(--primary); }
+        .status-online { color: #2E7D32; background: #E8F5E9; display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; }
+        .clear-chat-btn {
+            width: 100%;
+            padding: 0.6rem;
+            border-radius: 10px;
+            border: 2px solid var(--border);
+            background: white;
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            color: var(--accent);
+            transition: all 0.2s;
+            margin-top: 1rem;
+        }
+        .clear-chat-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
+
+        /* Chat area */
+        .chat-main { display: flex; flex-direction: column; height: 100%; }
+        .chat-topbar { 
+            padding: 1rem 1.5rem; 
+            background: white; 
+            border-bottom: 2px solid var(--border); 
+            display: flex; 
+            align-items: center; 
+            gap: 1rem;
+            flex-shrink: 0;
+        }
+        .bot-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--accent)); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+        .bot-info h3 { font-family: var(--font-display); font-weight: 800; font-size: 1rem; margin: 0; }
+        .bot-info p { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; margin: 0; }
+        .online-dot { width: 8px; height: 8px; background: var(--accent3); border-radius: 50%; display: inline-block; margin-right: 4px; animation: blink 1.5s infinite; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+        .ai-badge { background: var(--primary); color: white; font-size: 0.7rem; border-radius: 20px; padding: 2px 8px; margin-left: 8px; }
+
+        /* Chat messages - SCROLLABLE */
+        .chat-messages { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 1.5rem; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 1rem; 
+            background: var(--bg);
+            scroll-behavior: smooth;
+        }
+        
+        /* Custom scrollbar */
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-messages::-webkit-scrollbar-track {
+            background: var(--border);
+            border-radius: 10px;
+        }
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        .msg { 
+            max-width: 80%; 
+            display: flex; 
+            gap: 0.7rem; 
+            align-items: flex-start; 
+            animation: msgIn 0.3s ease;
+        }
+        @keyframes msgIn { from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)} }
+        .msg.user { align-self: flex-end; flex-direction: row-reverse; }
+        .msg-avatar { width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+        .bot .msg-avatar { background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; }
+        .user .msg-avatar { background: linear-gradient(135deg, var(--accent3), #2E7D32); color: white; }
+        .msg-bubble {
+            padding: 0.9rem 1.1rem;
+            border-radius: 18px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            line-height: 1.6;
+            word-wrap: break-word;
+            max-width: 100%;
+        }
+        .bot .msg-bubble { background: white; border: 2px solid var(--border); border-bottom-left-radius: 4px; color: var(--text); }
+        .user .msg-bubble { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border-bottom-right-radius: 4px; }
+        
+        /* Link styling in messages */
+        .msg-bubble a {
+            color: var(--primary);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: all 0.2s;
+            display: inline-block;
+            margin: 0.2rem 0;
+        }
+        .msg-bubble a:hover {
+            border-bottom-color: var(--primary);
+            text-decoration: none;
+        }
+        .user .msg-bubble a {
+            color: #FFD93D;
+            border-bottom-color: rgba(255,255,255,0.3);
+        }
+        .user .msg-bubble a:hover {
+            border-bottom-color: #FFD93D;
+        }
+        
+        .msg-time { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.3rem; text-align: right; }
+
+        .suggestion-chips { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 0.5rem; 
+            margin-top: 0.7rem; 
+        }
+        .sugg-chip {
+            padding: 0.4rem 0.9rem;
+            border-radius: 50px;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            background: white;
+            transition: all 0.2s;
+        }
+        .sugg-chip:hover { background: var(--primary); color: white; transform: translateY(-2px); }
+
+        .typing-indicator { display: none; align-self: flex-start; }
+        .typing-indicator.visible { display: flex; }
+        .typing-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary); margin: 0 2px; animation: typingBounce 1s infinite; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typingBounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-8px)} }
+        .typing-bubble { background: white; border: 2px solid var(--border); border-radius: 18px; border-bottom-left-radius: 4px; padding: 0.8rem 1rem; display: flex; align-items: center; gap: 4px; }
+
+        /* Input area */
+        .chat-input-area { 
+            padding: 1rem 1.5rem; 
+            background: white; 
+            border-top: 2px solid var(--border); 
+            display: flex; 
+            gap: 0.7rem; 
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .chat-input-area input {
+            flex: 1;
+            padding: 0.85rem 1.2rem;
+            border: 2.5px solid var(--border);
+            border-radius: 50px;
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            font-weight: 600;
+            outline: none;
+            transition: border 0.2s;
+            background: var(--bg);
+        }
+        .chat-input-area input:focus { border-color: var(--primary); }
+        .send-btn {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .send-btn:hover { transform: scale(1.1); box-shadow: 0 4px 12px rgba(108,99,255,0.4); }
+
+        @media(max-width:768px) {
+            .chat-layout { grid-template-columns: 1fr; }
+            .chat-sidebar { display: none; }
+            .msg { max-width: 90%; }
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-logo"><span class="logo-icon">🧠</span><span class="logo-text">Bright<strong>Minds</strong></span></div>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="courses.html"><i class="fas fa-book-open"></i> Courses</a></li>
+                <li><a href="games.html"><i class="fas fa-gamepad"></i> Games</a></li>
+                <li><a href="assessment.html"><i class="fas fa-brain"></i> Assessment</a></li>
+                <li><a href="chatbot.html" class="active"><i class="fas fa-robot"></i> AI Tutor</a></li>
+                <li><a href="disability.html"><i class="fas fa-heart"></i> Awareness</a></li>
+                <li><a href="about.html"><i class="fas fa-users"></i> About</a></li>
+            </ul>
+        </nav>
+        <button class="hamburger" id="hamburger"><i class="fas fa-bars"></i></button>
+    </header>
+
+    <div class="chat-layout">
+        <!-- Sidebar -->
+        <aside class="chat-sidebar">
+            <div>
+                <p class="sidebar-title">💡 Quick Topics</p>
+                <button class="quick-chip" onclick="sendQuick('What courses can I take?')">📚 Show me courses</button>
+                <button class="quick-chip" onclick="sendQuick('Tell me about Math')">➕ Math learning</button>
+                <button class="quick-chip" onclick="sendQuick('Tell me about English')">📖 English learning</button>
+                <button class="quick-chip" onclick="sendQuick('I want to play games')">🎮 Games & Activities</button>
+                <button class="quick-chip" onclick="sendQuick('I want to take a test')">📝 Take a test</button>
+                <button class="quick-chip" onclick="sendQuick('What is ADHD?')">🧠 What is ADHD?</button>
+                <button class="quick-chip" onclick="sendQuick('What is Autism?')">💛 What is Autism?</button>
+                <button class="quick-chip" onclick="sendQuick('Help me with dyslexia')">📝 Help with dyslexia</button>
+                <button class="quick-chip" onclick="sendQuick('Give me a learning tip')">✨ Learning tip</button>
+                <button class="quick-chip" onclick="sendQuick('Tell me a fun fact')">🌟 Fun fact</button>
+                <button class="quick-chip" onclick="sendQuick('What should I do first?')">🎯 Recommendations</button>
+                <button class="quick-chip" onclick="sendQuick('How am I doing?')">📊 My progress</button>
+            </div>
+
+            <div class="mood-section">
+                <span class="mood-label">How are you feeling today?</span>
+                <div class="mood-grid">
+                    <button class="mood-btn" onclick="selectMood(this,'happy')" title="Happy">😊</button>
+                    <button class="mood-btn" onclick="selectMood(this,'excited')" title="Excited">🤩</button>
+                    <button class="mood-btn" onclick="selectMood(this,'calm')" title="Calm">😌</button>
+                    <button class="mood-btn" onclick="selectMood(this,'tired')" title="Tired">😴</button>
+                    <button class="mood-btn" onclick="selectMood(this,'confused')" title="Confused">😕</button>
+                    <button class="mood-btn" onclick="selectMood(this,'sad')" title="Sad">😢</button>
+                </div>
+            </div>
+
+            <div>
+                <button class="clear-chat-btn" onclick="clearChat()">
+                    <i class="fas fa-trash-alt"></i> Clear Conversation
+                </button>
+            </div>
+
+            <div class="ai-status">
+                <div class="ai-status-title">🤖 AI Engine Status</div>
+                <div class="ai-stat-row"><span>Model</span><span class="ai-stat-val">Enhanced AI</span></div>
+                <div class="ai-stat-row"><span>Status</span><span class="status-online" id="aiStatus">● Online</span></div>
+                <div class="ai-stat-row"><span>Messages</span><span class="ai-stat-val" id="msgCount">0</span></div>
+                <div class="ai-stat-row"><span>API Status</span><span class="ai-stat-val" id="apiStatus">Checking...</span></div>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <div class="chat-main">
+            <div class="chat-topbar">
+                <div class="bot-avatar">🤖</div>
+                <div class="bot-info">
+                    <h3>Minnie – Your AI Tutor <span class="ai-badge">Powered by AI</span></h3>
+                    <p><span class="online-dot"></span>Enhanced AI · Understands your needs · Provides direct links to features</p>
+                </div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <!-- Messages will appear here -->
+            </div>
+
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="Ask me anything... Type 'help' to see what I can do!" onkeypress="handleKey(event)">
+                <button class="send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // ============================================================
+    //  ENHANCED AI-POWERED CHATBOT - With Feature Links
+    // ============================================================
+
+    const API_BASE_URL = 'http://localhost:5000/api';
+    let messageCount = 0;
+    let sessionId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    let currentMood = null;
+
+    // Check API status on load
+    async function checkAPIStatus() {
+        const statusEl = document.getElementById('apiStatus');
+        try {
+            const response = await fetch(`${API_BASE_URL}/health`);
+            if (response.ok) {
+                const data = await response.json();
+                statusEl.innerHTML = '✅ Connected';
+                statusEl.style.color = '#2E7D32';
+                console.log('AI Backend connected:', data);
+            } else {
+                statusEl.innerHTML = '⚠️ Error';
+                statusEl.style.color = '#F57C00';
+            }
+        } catch (error) {
+            console.error('API connection error:', error);
+            statusEl.innerHTML = '❌ Offline';
+            statusEl.style.color = '#C62828';
+            addBotMessage("🔌 **AI backend not detected!**\n\nTo enable AI features:\n1. Run `python backend/app.py`\n2. Wait for 'AI Engine Ready'\n3. Refresh this page\n\nFor now, I'll use basic responses.", 
+                ['Start Python backend', 'Tell me about courses', 'Show me games']);
+        }
+    }
+
+    // Send message to AI
+    async function sendMessageToAI(userMessage) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/chat`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: userMessage,
+                    session_id: sessionId,
+                    mood: currentMood
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`API error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return {
+                response: data.response,
+                suggestions: data.suggestions || []
+            };
+        } catch (error) {
+            console.error('AI API error:', error);
+            return getFallbackResponse(userMessage);
+        }
+    }
+
+    // Fallback responses when server is not running
+    function getFallbackResponse(message) {
+        const msg = message.toLowerCase();
+        let response = "";
+        let suggestions = [];
+
+        if (msg.includes('hello') || msg.includes('hi')) {
+            response = "👋 Hello! I'm Minnie. Please start the Python backend for full AI features!";
+        } else if (msg.includes('course') || msg.includes('learn')) {
+            response = "📚 We have Math, English, and General Knowledge courses!\n\n👉 <a href='/courses.html' style='color:#6C63FF;'>View Courses →</a>";
+        } else if (msg.includes('math')) {
+            response = "➕ Math at Bright Minds covers numbers, addition, subtraction, multiplication, and word problems!\n\n👉 <a href='/assessment.html' style='color:#6C63FF;'>Take Math Quiz →</a>";
+        } else if (msg.includes('test') || msg.includes('quiz') || msg.includes('assessment')) {
+            response = "📝 Ready to test your knowledge?\n\n👉 <a href='/assessment.html' style='color:#6C63FF; background:#F3F0FF; padding:8px 16px; border-radius:25px; display:inline-block;'>Take AI Assessment →</a>";
+        } else if (msg.includes('adhd')) {
+            response = "🧠 ADHD affects focus and impulse control. We have short, engaging activities designed for children with ADHD!\n\n👉 <a href='/disability.html' style='color:#6C63FF;'>Learn More →</a>";
+        } else if (msg.includes('autism')) {
+            response = "💙 Autism (ASD) affects communication and sensory processing. Our platform uses calm, predictable learning environments!\n\n👉 <a href='/disability.html' style='color:#6C63FF;'>Learn More →</a>";
+        } else if (msg.includes('game') || msg.includes('play')) {
+            response = "🎮 Try our Memory Match, Word Scramble, and Pattern Play games!\n\n👉 <a href='/games.html' style='color:#6C63FF;'>Play Games Now →</a>";
+        } else if (msg.includes('tip')) {
+            response = "💡 Try the Pomodoro technique: Study for 15 minutes, take a 5-minute break!";
+        } else if (msg.includes('fact')) {
+            response = "🐙 An octopus has THREE hearts!";
+        } else if (msg.includes('help')) {
+            response = "🆘 **I can help with:**\n\n• 📚 <a href='/courses.html' style='color:#6C63FF;'>Courses</a>\n• 🎮 <a href='/games.html' style='color:#6C63FF;'>Games</a>\n• 📝 <a href='/assessment.html' style='color:#6C63FF;'>Tests</a>\n• 🧠 <a href='/disability.html' style='color:#6C63FF;'>Disability info</a>\n• 💡 Learning tips\n\nWhat would you like?";
+        } else {
+            response = "🤔 I can help with courses, games, tests, and learning tips!\n\n👉 Type 'help' to see what I can do!";
+            suggestions = ['What courses do you have?', 'I want to take a test', 'Show me games', 'Tell me about ADHD'];
+        }
+        return { response, suggestions };
+    }
+
+    // Handle link clicks in messages
+    function handleLinkClicks() {
+        document.querySelectorAll('.msg-bubble a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const href = link.getAttribute('href');
+                if (href && !href.startsWith('#')) {
+                    window.location.href = href;
+                }
+            });
+        });
+    }
+
+    // Auto-scroll to bottom
+    function scrollToBottom() {
+        const container = document.getElementById('chatMessages');
+        container.scrollTop = container.scrollHeight;
+    }
+
+    // Render markdown/HTML in messages
+    function renderMarkdown(text) {
+        // Convert markdown-style links if any
+        let processed = text.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>');
+        // Convert newlines to breaks
+        processed = processed.replace(/\n/g, '<br>');
+        return processed;
+    }
+
+    // Add message to chat
+    function addMessage(text, sender, suggestions = []) {
+        const container = document.getElementById('chatMessages');
+        
+        // Remove typing indicator
+        const ti = document.getElementById('typingIndicator');
+        if (ti) ti.remove();
+
+        const msgEl = document.createElement('div');
+        msgEl.className = `msg ${sender}`;
+        
+        const avatar = sender === 'bot'
+            ? `<div class="msg-avatar">🤖</div>`
+            : `<div class="msg-avatar"><i class="fas fa-child"></i></div>`;
+
+        let chipHTML = '';
+        if (suggestions && suggestions.length > 0) {
+            chipHTML = `<div class="suggestion-chips">${suggestions.map(s => `<button class="sugg-chip" onclick="sendQuick('${s.replace(/'/g, "\\'")}')">${s}</button>`).join('')}</div>`;
+        }
+
+        const timeStr = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        
+        msgEl.innerHTML = `
+            ${avatar}
+            <div style="flex:1">
+                <div class="msg-bubble">${renderMarkdown(text)}${chipHTML}</div>
+                <div class="msg-time">${timeStr}</div>
+            </div>
+        `;
+        
+        container.appendChild(msgEl);
+        scrollToBottom();
+        
+        messageCount++;
+        document.getElementById('msgCount').textContent = messageCount;
+        
+        // Handle any links in the new message
+        setTimeout(handleLinkClicks, 100);
+    }
+
+    function addBotMessage(text, suggestions = []) {
+        addMessage(text, 'bot', suggestions);
+    }
+
+    function addUserMessage(text) {
+        addMessage(text, 'user');
+    }
+
+    function showTyping() {
+        const container = document.getElementById('chatMessages');
+        const existing = document.getElementById('typingIndicator');
+        if (existing) existing.remove();
+        
+        const ti = document.createElement('div');
+        ti.className = 'msg bot typing-indicator visible';
+        ti.id = 'typingIndicator';
+        ti.innerHTML = `
+            <div class="msg-avatar">🤖</div>
+            <div class="typing-bubble">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+        `;
+        container.appendChild(ti);
+        scrollToBottom();
+    }
+
+    async function sendMessage() {
+        const input = document.getElementById('chatInput');
+        const text = input.value.trim();
+        if (!text) return;
+
+        addUserMessage(text);
+        input.value = '';
+        showTyping();
+
+        const { response, suggestions } = await sendMessageToAI(text);
+        
+        const ti = document.getElementById('typingIndicator');
+        if (ti) ti.remove();
+        
+        addBotMessage(response, suggestions);
+    }
+
+    function sendQuick(text) {
+        document.getElementById('chatInput').value = text;
+        sendMessage();
+    }
+
+    function handleKey(e) {
+        if (e.key === 'Enter') sendMessage();
+    }
+
+    function selectMood(btn, mood) {
+        document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        currentMood = mood;
+        
+        const moodMessages = {
+            'happy': "I'm feeling happy today! 😊",
+            'excited': "I'm feeling excited! 🤩",
+            'calm': "I'm feeling calm today 😌",
+            'tired': "I'm feeling a bit tired 😴",
+            'confused': "I'm feeling confused 😕",
+            'sad': "I'm feeling a little sad today 😢"
+        };
+        
+        sendQuick(moodMessages[mood]);
+    }
+
+    function clearChat() {
+        if (confirm('Clear all conversation messages?')) {
+            const container = document.getElementById('chatMessages');
+            container.innerHTML = '';
+            messageCount = 0;
+            document.getElementById('msgCount').textContent = '0';
+            
+            // Add welcome message back
+            addBotMessage("👋 Conversation cleared! I'm Minnie, your AI learning companion.\n\nI can help you with:\n• 📚 Courses (Math, English, GK)\n• 🎮 Games and activities\n• 📝 Tests and assessments\n• 🧠 ADHD, Autism, Dyslexia info\n• 💡 Learning tips and fun facts\n\nWhat would you like to explore?", 
+                ['Tell me about courses', 'I want to take a test', 'Give me a tip', 'Tell me a fun fact']);
+        }
+    }
+
+    // Hamburger menu for mobile
+    const hamburger = document.getElementById('hamburger');
+    const navLinks = document.querySelector('.nav-links');
+    if (hamburger) {
+        hamburger.addEventListener('click', () => {
+            navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
+        });
+    }
+
+    // Initialize
+    window.onload = () => {
+        checkAPIStatus();
+        
+        setTimeout(() => {
+            if (messageCount === 0) {
+                addBotMessage("👋 Hi! I'm Minnie, your AI-powered learning companion!\n\nI use **Enhanced AI** to understand what you need. I can provide direct links to:\n\n📚 **Courses** - Math, English, GK\n🎮 **Games** - Memory, Word, Pattern games\n📝 **Tests** - Adaptive assessments\n🧠 **Disability Info** - ADHD, Autism, Dyslexia\n💡 **Learning Tips & Fun Facts**\n\n**Try asking:**\n• 'I want to take a test'\n• 'Show me math courses'\n• 'What games can I play?'\n• 'Tell me about ADHD'\n\nWhat would you like to explore?", 
+                    ['I want to take a test', 'Show me courses', 'What games can I play?', 'Tell me a fun fact']);
+            }
+        }, 500);
+    };
+    </script>
+</body>
+</html>

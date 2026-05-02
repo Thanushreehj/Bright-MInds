@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disability Awareness – Bright Minds</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* ===== TABS ===== */
+        .tabs-wrapper { max-width: 1100px; margin: 0 auto; padding: 2rem 2rem 4rem; }
+        .tab-buttons { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 2.5rem; justify-content: center; }
+        .tab-btn {
+            padding: 0.65rem 1.4rem;
+            border-radius: 50px;
+            border: 2.5px solid var(--border);
+            background: white;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .tab-btn:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); }
+        .tab-btn.active { background: var(--primary); border-color: var(--primary); color: white; box-shadow: 0 6px 20px rgba(108,99,255,0.35); }
+
+        /* ===== TAB PANELS ===== */
+        .tab-panel { display: none; animation: fadeInUp 0.4s ease both; }
+        .tab-panel.active { display: block; }
+        @keyframes fadeInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+        /* ===== CONDITION CARD ===== */
+        .condition-intro {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 1.5rem;
+            background: white;
+            border-radius: var(--radius);
+            padding: 2rem 2.5rem;
+            box-shadow: var(--shadow);
+            border: 2px solid var(--border);
+            margin-bottom: 2rem;
+            align-items: center;
+        }
+        .cond-emoji { font-size: 4rem; line-height: 1; }
+        .cond-title { font-family: var(--font-display); font-size: 1.8rem; font-weight: 900; color: var(--text); margin-bottom: 0.4rem; }
+        .cond-subtitle { font-size: 0.95rem; color: var(--text-muted); font-weight: 600; }
+
+        /* ===== INFO GRID ===== */
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .info-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1.8rem;
+            box-shadow: var(--shadow);
+            border: 2px solid var(--border);
+            transition: var(--transition);
+        }
+        .info-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+        .info-card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+        .info-card-icon { font-size: 1.8rem; }
+        .info-card h3 { font-family: var(--font-display); font-size: 1.1rem; font-weight: 800; }
+        .info-list { list-style: none; }
+        .info-list li { font-size: 0.9rem; color: var(--text-muted); font-weight: 600; padding: 0.3rem 0; border-bottom: 1px dashed var(--border); display: flex; align-items: flex-start; gap: 0.5rem; }
+        .info-list li:last-child { border-bottom: none; }
+        .info-list li::before { content: '•'; color: var(--primary); font-weight: 900; flex-shrink: 0; }
+
+        /* ===== MYTH VS FACT ===== */
+        .mvf-section { margin-bottom: 2rem; }
+        .mvf-section h2 { font-family: var(--font-display); font-size: 1.4rem; font-weight: 900; margin-bottom: 1.2rem; }
+        .mvf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .mvf-item { border-radius: var(--radius-sm); padding: 1.2rem 1.5rem; }
+        .myth { background: #FFF3F3; border: 2px solid #FFD0D0; }
+        .fact  { background: #F0FFF4; border: 2px solid #B7EFC5; }
+        .mvf-tag { font-size: 0.72rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.4rem; }
+        .myth .mvf-tag { color: var(--accent); }
+        .fact  .mvf-tag { color: #2E7D32; }
+        .mvf-item p { font-size: 0.88rem; color: var(--text); font-weight: 600; line-height: 1.6; }
+
+        /* ===== TIPS BANNER ===== */
+        .tips-banner {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            color: white;
+            margin-bottom: 2rem;
+        }
+        .tips-banner h2 { font-family: var(--font-display); font-size: 1.5rem; font-weight: 900; margin-bottom: 1.2rem; }
+        .tips-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .tip-item { background: rgba(255,255,255,0.12); border-radius: var(--radius-sm); padding: 1rem 1.2rem; border: 1.5px solid rgba(255,255,255,0.2); }
+        .tip-item .tip-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .tip-item p { font-size: 0.88rem; font-weight: 700; opacity: 0.92; line-height: 1.5; }
+
+        /* ===== RESOURCE CARD ===== */
+        .resource-section { margin-bottom: 2rem; }
+        .resource-section h2 { font-family: var(--font-display); font-size: 1.4rem; font-weight: 900; margin-bottom: 1.2rem; }
+        .resource-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+        .resource-card {
+            background: white;
+            border-radius: var(--radius-sm);
+            padding: 1.4rem;
+            box-shadow: var(--shadow);
+            border: 2px solid var(--border);
+            display: flex; gap: 1rem; align-items: flex-start;
+        }
+        .resource-card .rc-icon { font-size: 2rem; flex-shrink: 0; }
+        .resource-card h4 { font-size: 0.95rem; font-weight: 800; margin-bottom: 0.3rem; }
+        .resource-card p { font-size: 0.82rem; color: var(--text-muted); font-weight: 600; line-height: 1.5; }
+
+        /* ===== QUICK NAV ===== */
+        .quick-nav {
+            background: #F3F0FF;
+            border-radius: var(--radius);
+            padding: 2rem 2.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            border: 2px solid var(--border);
+        }
+        .quick-nav h3 { font-family: var(--font-display); font-weight: 900; font-size: 1.2rem; margin-bottom: 1rem; }
+        .quick-nav-links { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+        .quick-nav-links a {
+            padding: 0.6rem 1.4rem;
+            border-radius: 50px;
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 0.88rem;
+            transition: var(--transition);
+        }
+        .quick-nav-links a:hover { background: var(--primary); color: white; transform: translateY(-2px); }
+
+        @media (max-width: 700px) {
+            .mvf-grid { grid-template-columns: 1fr; }
+            .condition-intro { grid-template-columns: 1fr; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== NAVBAR ===== -->
+    <header class="navbar" id="navbar">
+        <div class="nav-logo">
+            <span class="logo-icon">🧠</span>
+            <span class="logo-text">Bright<strong>Minds</strong></span>
+        </div>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="courses.html"><i class="fas fa-book-open"></i> Courses</a></li>
+                <li><a href="games.html"><i class="fas fa-gamepad"></i> Games</a></li>
+                <li><a href="assessment.html"><i class="fas fa-brain"></i> AI Assessment</a></li>
+                <li><a href="chatbot.html"><i class="fas fa-robot"></i> AI Tutor</a></li>
+                <li><a href="disability.html" class="active"><i class="fas fa-heart"></i> Awareness</a></li>
+                <li><a href="about.html"><i class="fas fa-users"></i> About</a></li>
+            </ul>
+        </nav>
+        <button class="hamburger" id="hamburger"><i class="fas fa-bars"></i></button>
+    </header>
+
+    <!-- ===== HERO ===== -->
+    <div class="page-hero" style="background: linear-gradient(135deg, #FF6B6B 0%, #c0392b 100%);">
+        <h1>💛 Disability Awareness</h1>
+        <p>Understanding, supporting, and celebrating every child's unique learning journey — for parents, educators, and caregivers.</p>
+    </div>
+
+    <!-- ===== TABS ===== -->
+    <div class="tabs-wrapper">
+
+        <div class="tab-buttons">
+            <button class="tab-btn active" onclick="switchTab('autism')">🌈 Autism (ASD)</button>
+            <button class="tab-btn" onclick="switchTab('adhd')">⚡ ADHD</button>
+            <button class="tab-btn" onclick="switchTab('slow')">🌱 Slow Learning</button>
+            <button class="tab-btn" onclick="switchTab('dyslexia')">📝 Dyslexia</button>
+        </div>
+
+        <!-- ===== AUTISM ===== -->
+        <div class="tab-panel active" id="tab-autism">
+            <div class="condition-intro">
+                <div class="cond-emoji">🌈</div>
+                <div>
+                    <div class="cond-title">Autism Spectrum Disorder (ASD)</div>
+                    <div class="cond-subtitle">A neurological and developmental condition that affects how people interact, communicate, learn, and behave. Every autistic child is unique — it's a spectrum, not a single experience.</div>
+                </div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <div class="info-card-icon">🔍</div>
+                        <h3>Common Signs in Children</h3>
+                    </div>
+                    <ul class="info-list">
+                        <li>Delayed or limited speech development</li>
+                        <li>Difficulty making or maintaining eye contact</li>
+                        <li>Repetitive movements (rocking, flapping)</li>
+                        <li>Strong preference for routines and predictability</li>
+                        <li>Intense focus on specific interests</li>
+                        <li>Difficulty understanding social cues</li>
+                        <li>Sensitivity to sounds, lights, or textures</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <div class="info-card-icon">🏫</div>
+                        <h3>How It Affects Learning</h3>
+                    </div>
+                    <ul class="info-list">
+                        <li>Learns best through visual schedules and structure</li>
+                        <li>May excel in memory, pattern recognition, or details</li>
+                        <li>Group work and noisy environments can be overwhelming</li>
+                        <li>Literal thinking — metaphors can be confusing</li>
+                        <li>Special interests can be powerful motivators</li>
+                        <li>Transitions between activities may be difficult</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <div class="info-card-icon">🌟</div>
+                        <h3>Strengths to Celebrate</h3>
+                    </div>
+                    <ul class="info-list">
+                        <li>Exceptional attention to detail</li>
+                        <li>Strong memory for facts and figures</li>
+                        <li>Deep expertise in areas of special interest</li>
+                        <li>Honest and direct communication</li>
+                        <li>Passionate and dedicated</li>
+                        <li>Original, out-of-the-box thinking</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mvf-section">
+                <h2>🔮 Myths vs. Facts</h2>
+                <div class="mvf-grid">
+                    <div class="mvf-item myth">
+                        <div class="mvf-tag">❌ Myth</div>
+                        <p>"Autistic children can't feel emotions or love."</p>
+                    </div>
+                    <div class="mvf-item fact">
+                        <div class="mvf-tag">✅ Fact</div>
+                        <p>Autistic children feel emotions deeply — they may simply express them differently than neurotypical children.</p>
+                    </div>
+                    <div class="mvf-item myth">
+                        <div class="mvf-tag">❌ Myth</div>
+                        <p>"All autistic people have savant abilities like in the movies."</p>
+                    </div>
+                    <div class="mvf-item fact">
+                        <div class="mvf-tag">✅ Fact</div>
+                        <p>While some autistic individuals have remarkable skills, ASD is a diverse spectrum and experiences vary greatly.</p>
+                    </div>
+                    <div class="mvf-item myth">
+                        <div class="mvf-tag">❌ Myth</div>
+                        <p>"Autism is caused by bad parenting or vaccines."</p>
+                    </div>
+                    <div class="mvf-item fact">
+                        <div class="mvf-tag">✅ Fact</div>
+                        <p>Autism is a complex neurological condition. Scientific research has firmly debunked vaccine connections.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tips-banner">
+                <h2>💡 Tips for Parents & Educators</h2>
+                <div class="tips-grid">
+                    <div class="tip-item"><div class="tip-icon">📅</div><p>Use visual schedules and picture cards to show what comes next in the day.</p></div>
+                    <div class="tip-item"><div class="tip-icon">🗣️</div><p>Use clear, simple language. Avoid idioms and sarcasm when possible.</p></div>
+                    <div class="tip-item"><div class="tip-icon">🎯</div><p>Tap into special interests to make learning relevant and motivating.</p></div>
+                    <div class="tip-item"><div class="tip-icon">🤫</div><p>Reduce sensory overload — quiet spaces and noise-cancelling options help.</p></div>
+                    <div class="tip-item"><div class="tip-icon">🏆</div><p>Celebrate small wins enthusiastically — positive reinforcement matters.</p></div>
+                </div>
+            </div>
+
+            <div class="quick-nav">
+                <h3>🚀 Help Your Child Learn on Bright Minds</h3>
+                <div class="quick-nav-links">
+                    <a href="assessment.html">Take AI Assessment</a>
+                    <a href="games.html">Play Memory Games</a>
+                    <a href="chatbot.html">Talk to AI Tutor</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== ADHD ===== -->
+        <div class="tab-panel" id="tab-adhd">
+            <div class="condition-intro">
+                <div class="cond-emoji">⚡</div>
+                <div>
+                    <div class="cond-title">Attention Deficit Hyperactivity Disorder (ADHD)</div>
+                    <div class="cond-subtitle">A neurodevelopmental disorder marked by inattention, impulsivity, and/or hyperactivity. It's one of the most common childhood conditions — and with the right support, children with ADHD thrive.</div>
+                </div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <div class="info-card-icon">🔍</div>
+                        <h3>Common Signs in Children</h3>
+                    </div>
+                    <ul class="info-list">
+                        <li>Difficulty staying focused on tasks or play</li>
+                        <li>Easily distracted by unrelated thoughts</li>
+                        <li>Fidgeting, squirming, or trouble staying seated</li>
+                        <li>Interrupting conversations or blurting answers</li>
+                        <li>Forgetting daily tasks or losing belongings</li>
+                        <li>Difficulty following multi-step instructions</li>
+                        <li>Mood swings and emotional sensitivity</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <div class="info-card-icon">🏫</div>
+                        <h3>How It Affects Learning</h3>
+                    </div>
+                    <ul class="info-list">
+                        <li>Long lectures or reading sessions are hard to sustain</li>
+                        <li>Short tasks with frequent breaks work much better</li>
+                        <li>Hyperfocus: can deeply engage in things they love</li>
+                        <li>Forgetfulness affects homework and deadlines</li>
+                        <li>Movement-based learning improves retention</li>
+                        <li>Needs structured environments and clear expectations</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <div class="info-card-icon">🌟</div>
+                        <h3>Strengths to Celebrate</h3>
+                    </div>
+                    <ul class="info-list">
+                        <li>Incredible creativity and imagination</li>
+                        <li>High energy and enthusiasm</li>
+                        <li>Ability to hyperfocus on passionate topics</li>
+                        <li>Spontaneous and adventurous thinking</li>
+                        <li>Excellent at thinking on their feet</li>
+                        <li>Strong empathy and emotional depth</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mvf-section">
+                <h2>🔮 Myths vs. Facts</h2>
+                <div class="mvf-grid">
+                    <div class="mvf-item myth">
+                        <div class="mvf-tag">❌ Myth</div>
+                        <p>"ADHD isn't real — kids are just being badly behaved."</p>
+                    </div>
+                    <div class="mvf-item fact">
+                        <div class="mvf-tag">✅ Fact</div>
+                        <p>ADHD is a well-documented neurological condition, recognized worldwide by medical and educational organizations.</p>
+                    </div>
+                    <div class="mvf-item myth">
+                        <div class="mvf-tag">❌ Myth</div>
+                        <p>"Children with ADHD can never focus on anything."</p>
+                    </div>
+                    <div class="mvf-item fact">
+                        <div class="mvf-tag">✅ Fact</div>
+                        <p>Many children with ADHD experience hyperfocus — intense, deep concentration — when engaged in something they love.</p>
+                    </div>
+                    <div class="mvf-item myth">
+                        <div class="mvf-tag">❌ Myth</div>
+                        <p>"Only boys get ADHD."</p>
+                    </div>
+                    <div class="mvf-item fact">
+                        <div class="mvf-tag">✅ Fact</div>
+                        <p>ADHD affects all genders. Girls often present with inattentive symptoms and are frequently underdiagnosed.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tips-banner" style="background: linear-gradient(135deg, #FF9A3C, #e67e22);">
+                <h2>💡 Tips for Parents & Educators</h2>
+                <div class="tips-grid">
+                    <div class="tip-item"><div class="tip-icon">⏱️</div><p>Break tasks into small, timed chunks with short breaks in between.</p></div>
+                    <div class="tip-item"><div class="tip-icon">🏃</div><p>Allow movement — let kids stand, use fidget tools, or take brain breaks.</p></div>
+                    <div class="tip-item"><div class="tip-icon">📋</div><p>Use checklists and visual reminders to support memory and organization.</p></div>
+                    <div class="tip-item"><div class="tip-icon">🎮</div><p>Gamify learning — reward systems and immediate feedback are highly effective.</p></div>
+                    <div class="tip-item"><div class="tip-icon">❤️</div><p>Focus on effort, not just results. Praise persistence and self-control.</p></div>
+                </div>
+            </div>
+
+            <div class="quick-nav">
+                <h3>🚀 Help Your Child Learn on Bright Minds</h3>
+                <div class="quick-nav-links">
+                    <a href="assessment.html">Take AI Assessment</a>
+                    <a href="games.html">Play Fun Games</a>
+                    <a href="courses.html">Explore Courses</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== SLOW LEARNING ===== -->
+        <div class="tab-panel" id="tab-slow">
+            <div class="condition-intro">
+                <div class="cond-emoji">🌱</div>
+                <div>
+                    <div class="cond-title">Slow Learning</div>
+                    <div class="cond-subtitle">A term used for children who learn at a slower pace than their peers but do not have a specific learning disability. These children are intelligent and capable — they simply need more time, patience, and the right approach.</div>
+                </div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <div class="info-card-icon">🔍</div>
+                        <h3>Common Signs in Children</h3>
+                    </div>
+                    <ul class="info-list">
+                        <li>Needs more repetition to master concepts</li>
+                        <li>Short attention span and easy frustration</li>
+                        <li>Difficulty with abstract or complex ideas</li>
+                        <li>Struggles to transfer learning to new contexts</li>
+                        <li>Slower reading or writing speed</li>
+                        <li>Low confidence and reluctance to try new tasks</li>
+                        <li>Often behind grade-level expectations</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <div class="info-card-icon">🏫</div>
+                        <h3>How It Affects Learning</h3>
+                    </div>
+                    <ul class="info-list">
+                        <li>May fall behind in large-group classroom settings</li>
+                        <li>Benefits greatly from one-on-one instruction</li>
+                        <li>Visual and hands-on learning are most effective</li>
+                        <li>Needs consistent review and spaced repetition</li>
+                        <li>Real-world, concrete examples work better than theory</li>
+                        <li>Emotional safety is key — fear of failure hinders progress</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <div class="info-card-icon">🌟</div>
+                        <h3>Strengths to Celebrate</h3>
+                    </div>
+                    <ul class="info-list">
+                        <li>Thorough and careful when given enough time</li>
+                        <li>Strong social and emotional intelligence</li>
+                        <li>Loyal, kind, and eager to please</li>
+                        <li>Develops deep understanding once concepts click</li>
+                        <li>Resilient — often persists through challenges</li>
+                        <li>Often creative and artistic</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mvf-section">
+                <h2>🔮 Myths vs. Facts</h2>
+                <div class="mvf-grid">
+                    <div class="mvf-item myth">
+                        <div class="mvf-tag">❌ Myth</div>
+                        <p>"Slow learners are not intelligent or capable."</p>
+                    </div>
+                    <div class="mvf-item fact">
+                        <div class="mvf-tag">✅ Fact</div>
+                        <p>Slow learners have average intelligence. They need more time and adapted teaching — not less care or opportunity.</p>
+                    </div>
+                    <div class="mvf-item myth">
+                        <div class="mvf-tag">❌ Myth</div>
+                        <p>"They will never catch up with their peers."</p>
+                    </div>
+                    <div class="mvf-item fact">
+                        <div class="mvf-tag">✅ Fact</div>
+                        <p>With the right interventions early on, many slow learners achieve grade-level or above in several areas.</p>
+                    </div>
+                    <div class="mvf-item myth">
+                        <div class="mvf-tag">❌ Myth</div>
+                        <p>"Slow learning is the same as intellectual disability."</p>
+                    </div>
+                    <div class="mvf-item fact">
+                        <div class="mvf-tag">✅ Fact</div>
+                        <p>Slow learners fall in the "borderline" IQ range. Intellectual disability is a separate, more significant condition.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tips-banner" style="background: linear-gradient(135deg, #6BCB77, #27ae60);">
+                <h2>💡 Tips for Parents & Educators</h2>
+                <div class="tips-grid">
+                    <div class="tip-item"><div class="tip-icon">🔁</div><p>Repeat and review consistently. Spaced repetition builds long-term memory.</p></div>
+                    <div class="tip-item"><div class="tip-icon">🖼️</div><p>Use pictures, diagrams, and physical objects to explain abstract ideas.</p></div>
+                    <div class="tip-item"><div class="tip-icon">💬</div><p>Encourage and validate effort above everything else. Build their confidence.</p></div>
+                    <div class="tip-item"><div class="tip-icon">🎯</div><p>Set small, achievable goals so the child experiences regular success.</p></div>
+                    <div class="tip-item"><div class="tip-icon">🤝</div><p>Collaborate with teachers to adapt lesson pacing and expectations.</p></div>
+                </div>
+            </div>
+
+            <div class="quick-nav">
+                <h3>🚀 Help Your Child Learn on Bright Minds</h3>
+                <div class="quick-nav-links">
+                    <a href="assessment.html">Take AI Assessment</a>
+                    <a href="courses.html">Beginner Courses</a>
+                    <a href="chatbot.html">AI Tutor Support</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== DYSLEXIA ===== -->
+        <div class="tab-panel" id="tab-dyslexia">
+            <div class="condition-intro">
+                <div class="cond-emoji">📝</div>
+                <div>
+                    <div class="cond-title">Dyslexia</div>
+                    <div class="cond-subtitle">A learning difference that primarily affects reading, spelling, and writing. It is unrelated to intelligence — many highly successful people are dyslexic. With the right support, children with dyslexia excel.</div>
+                </div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <div class="info-card-icon">🔍</div>
+                        <h3>Common Signs in Children</h3>
+                    </div>
+                    <ul class="info-list">
+                        <li>Difficulty reading aloud — slow, inaccurate, or effortful</li>
+                        <li>Confusing similar letters (b/d, p/q)</li>
+                        <li>Frequent spelling errors despite trying</li>
+                        <li>Difficulty sounding out unfamiliar words</li>
+                        <li>Trouble remembering sequences (days, alphabet)</li>
+                        <li>Avoids reading and writing activities</li>
+                        <li>Strong verbal skills but weaker written expression</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <div class="info-card-icon">🏫</div>
+                        <h3>How It Affects Learning</h3>
+                    </div>
+                    <ul class="info-list">
+                        <li>Reading-heavy subjects are exhausting and frustrating</li>
+                        <li>May need extra time on written tests</li>
+                        <li>Audio-based or oral learning works much better</li>
+                        <li>Dictation and speech-to-text tools are very helpful</li>
+                        <li>Often understands concepts better than written work suggests</li>
+                        <li>Phonics-based approaches are most effective for reading</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <div class="info-card-icon">🌟</div>
+                        <h3>Strengths to Celebrate</h3>
+                    </div>
+                    <ul class="info-list">
+                        <li>Exceptional 3D spatial reasoning</li>
+                        <li>Creative storytelling and imaginative thinking</li>
+                        <li>Big-picture, holistic thinking</li>
+                        <li>Strong problem-solving abilities</li>
+                        <li>Often gifted in art, music, engineering, or drama</li>
+                        <li>Highly empathetic and emotionally perceptive</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mvf-section">
+                <h2>🔮 Myths vs. Facts</h2>
+                <div class="mvf-grid">
+                    <div class="mvf-item myth">
+                        <div class="mvf-tag">❌ Myth</div>
+                        <p>"Dyslexic children see letters backwards — that's what causes it."</p>
+                    </div>
+                    <div class="mvf-item fact">
+                        <div class="mvf-tag">✅ Fact</div>
+                        <p>Dyslexia is a phonological processing difficulty. Letter reversal is one symptom, but it's not the defining cause.</p>
+                    </div>
+                    <div class="mvf-item myth">
+                        <div class="mvf-tag">❌ Myth</div>
+                        <p>"Children will outgrow dyslexia on their own."</p>
+                    </div>
+                    <div class="mvf-item fact">
+                        <div class="mvf-tag">✅ Fact</div>
+                        <p>Dyslexia is lifelong, but early intervention and the right strategies make reading significantly easier over time.</p>
+                    </div>
+                    <div class="mvf-item myth">
+                        <div class="mvf-tag">❌ Myth</div>
+                        <p>"Dyslexia means a child is not smart enough for regular school."</p>
+                    </div>
+                    <div class="mvf-item fact">
+                        <div class="mvf-tag">✅ Fact</div>
+                        <p>Many brilliant people — Einstein, Da Vinci, Steve Jobs — are believed to have been dyslexic. Intelligence and dyslexia are unrelated.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tips-banner" style="background: linear-gradient(135deg, #4ECDC4, #00838F);">
+                <h2>💡 Tips for Parents & Educators</h2>
+                <div class="tips-grid">
+                    <div class="tip-item"><div class="tip-icon">🎧</div><p>Use audiobooks and text-to-speech tools to reduce reading burden.</p></div>
+                    <div class="tip-item"><div class="tip-icon">🔤</div><p>Teach phonics systematically — structured literacy programs work best.</p></div>
+                    <div class="tip-item"><div class="tip-icon">🎨</div><p>Use multi-sensory learning — tracing letters, sandpaper letters, colors.</p></div>
+                    <div class="tip-item"><div class="tip-icon">⏳</div><p>Allow extra time for reading and writing tasks without pressure.</p></div>
+                    <div class="tip-item"><div class="tip-icon">🌟</div><p>Celebrate their creative and verbal strengths to build confidence.</p></div>
+                </div>
+            </div>
+
+            <div class="quick-nav">
+                <h3>🚀 Help Your Child Learn on Bright Minds</h3>
+                <div class="quick-nav-links">
+                    <a href="assessment.html">Take AI Assessment</a>
+                    <a href="courses.html">English Courses</a>
+                    <a href="games.html">Word Games</a>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- end tabs-wrapper -->
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <div class="footer-top">
+            <div class="footer-brand">
+                <span class="logo-icon">🧠</span>
+                <span class="logo-text">Bright<strong>Minds</strong></span>
+                <p>Together, we illuminate the path to learning for every child.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Platform</h4>
+                <ul>
+                    <li><a href="courses.html">Courses</a></li>
+                    <li><a href="games.html">Games</a></li>
+                    <li><a href="assessment.html">AI Assessment</a></li>
+                    <li><a href="chatbot.html">AI Tutor</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Learn</h4>
+                <ul>
+                    <li><a href="disability.html">Disability Awareness</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2024 Bright Minds. Made with ❤️ for every child.</p>
+        </div>
+    </footer>
+
+    <script>
+        function switchTab(id) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('tab-' + id).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        // Hamburger menu
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.querySelector('.nav-links');
+        if (hamburger) {
+            hamburger.addEventListener('click', () => navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex');
+        }
+    </script>
+</body>
+</html>

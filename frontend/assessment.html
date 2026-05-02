@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assessment – Bright Minds</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { background: var(--bg); }
+        .assessment-wrapper { max-width: 800px; margin: 0 auto; padding: 2rem; }
+
+        /* AI Engine Panel */
+        .ai-panel {
+            background: white; border-radius: var(--radius); padding: 1.2rem 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 2px solid var(--border);
+            display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: center;
+        }
+        .ai-indicator { display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; font-weight: 700; }
+        .ai-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent3); animation: aiPulse 1.5s infinite; }
+        @keyframes aiPulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.4);opacity:0.7} }
+        .diff-badge {
+            padding: 0.3rem 0.9rem; border-radius: 50px; font-size: 0.8rem; font-weight: 800;
+            background: var(--primary); color: white;
+        }
+        .diff-badge.easy   { background: var(--accent3); }
+        .diff-badge.medium { background: var(--accent2); color: var(--text); }
+        .diff-badge.hard   { background: var(--accent); }
+
+        /* Subject selector */
+        .subject-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
+        .subj-card {
+            padding: 1.5rem; border-radius: var(--radius); border: 3px solid var(--border);
+            background: white; text-align: center; cursor: pointer; transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+        .subj-card:hover, .subj-card.selected { border-color: var(--primary); background: #F3F0FF; transform: translateY(-4px); }
+        .subj-card .subj-icon { font-size: 2.5rem; margin-bottom: 0.7rem; }
+        .subj-card h3 { font-family: var(--font-display); font-weight: 800; margin-bottom: 0.3rem; }
+        .subj-card p { font-size: 0.82rem; color: var(--text-muted); font-weight: 600; }
+
+        /* Question card */
+        .q-card { background: white; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+        .q-header { padding: 1.5rem 2rem; border-bottom: 2px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .q-meta { font-size: 0.82rem; font-weight: 700; color: var(--text-muted); }
+        .q-body { padding: 2rem; }
+        .q-text { font-family: var(--font-display); font-size: 1.25rem; font-weight: 800; margin-bottom: 1.5rem; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+        .opt {
+            padding: 0.9rem 1.2rem; border: 2.5px solid var(--border); border-radius: var(--radius-sm);
+            background: white; font-family: var(--font-body); font-size: 0.95rem; font-weight: 700;
+            cursor: pointer; transition: var(--transition); text-align: left; color: var(--text);
+        }
+        .opt:hover:not(:disabled) { border-color: var(--primary); background: #F3F0FF; transform: translateX(4px); }
+        .opt.selected-correct { background: #E8F5E9 !important; border-color: var(--accent3) !important; color: #2E7D32 !important; }
+        .opt.selected-wrong   { background: #FFEBEE !important; border-color: var(--accent) !important;  color: #C62828 !important; }
+        .opt.reveal-correct   { background: #E8F5E9 !important; border-color: var(--accent3) !important; opacity: 0.7; }
+
+        /* Feedback banner */
+        .feedback-banner {
+            margin-top: 1.2rem; padding: 0.9rem 1.2rem; border-radius: var(--radius-sm);
+            font-weight: 700; font-size: 0.92rem; display: none;
+        }
+        .feedback-banner.correct { background: #E8F5E9; color: #2E7D32; border-left: 4px solid var(--accent3); display: block; }
+        .feedback-banner.wrong   { background: #FFEBEE; color: #C62828; border-left: 4px solid var(--accent); display: block; }
+
+        /* Progress */
+        .progress-row { display: flex; gap: 0.4rem; margin-bottom: 1.5rem; }
+        .prog-dot { height: 8px; flex: 1; border-radius: 4px; background: var(--border); transition: background 0.3s; }
+        .prog-dot.done-correct { background: var(--accent3); }
+        .prog-dot.done-wrong   { background: var(--accent); }
+        .prog-dot.current      { background: var(--primary); animation: progPulse 1s infinite; }
+        @keyframes progPulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+
+        /* Scoreboard */
+        .scoreboard { display: none; background: white; border-radius: var(--radius); box-shadow: var(--shadow); padding: 3rem; text-align: center; }
+        .score-circle {
+            width: 130px; height: 130px; border-radius: 50%;
+            background: conic-gradient(var(--primary) var(--p), var(--border) 0);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 2rem; position: relative;
+        }
+        .score-inner { width: 100px; height: 100px; border-radius: 50%; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .score-num { font-family: var(--font-display); font-size: 1.8rem; font-weight: 900; color: var(--primary); line-height: 1; }
+        .score-denom { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); }
+        .grade-badge { font-family: var(--font-display); font-size: 1.5rem; font-weight: 900; padding: 0.5rem 1.5rem; border-radius: 50px; display: inline-block; margin-bottom: 1rem; }
+        .grade-A { background: #E8F5E9; color: #2E7D32; }
+        .grade-B { background: #FFF8E1; color: #F57C00; }
+        .grade-C { background: #FFEBEE; color: #C62828; }
+        .ai-recommendation { background: #F3F0FF; border-radius: var(--radius-sm); padding: 1.2rem; margin: 1.5rem 0; text-align: left; }
+        .ai-rec-title { font-weight: 800; color: var(--primary); margin-bottom: 0.6rem; font-size: 0.9rem; }
+        .ai-rec-text { font-size: 0.9rem; font-weight: 600; color: var(--text); line-height: 1.7; }
+
+        .q-footer { padding: 1rem 2rem; border-top: 2px solid var(--border); background: #fafafa; display: flex; justify-content: space-between; align-items: center; }
+        .q-counter { font-weight: 700; color: var(--text-muted); font-size: 0.9rem; }
+        .next-btn { padding: 0.7rem 1.8rem; border-radius: 50px; background: var(--primary); color: white; border: none; font-family: var(--font-body); font-size: 0.9rem; font-weight: 800; cursor: pointer; transition: var(--transition); display: none; }
+        .next-btn.visible { display: block; }
+        .next-btn:hover { background: var(--primary-dark); transform: translateX(4px); }
+
+        @media(max-width:600px) {
+            .subject-selector { grid-template-columns: 1fr; }
+            .options-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-logo"><span class="logo-icon">🧠</span><span class="logo-text">Bright<strong>Minds</strong></span></div>
+        <nav><ul class="nav-links">
+            <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="courses.html"><i class="fas fa-book-open"></i> Courses</a></li>
+            <li><a href="games.html"><i class="fas fa-gamepad"></i> Games</a></li>
+            <li><a href="assessment.html" class="active"><i class="fas fa-brain"></i> Assessment</a></li>
+            <li><a href="chatbot.html"><i class="fas fa-robot"></i> AI Tutor</a></li>
+            <li><a href="disability.html"><i class="fas fa-heart"></i> Awareness</a></li>
+        </ul></nav>
+    </header>
+
+    <div class="page-hero">
+        <h1>🧠 AI-Powered Adaptive Assessment</h1>
+        <p>Our rule-based AI engine adjusts question difficulty in real-time based on your performance.</p>
+    </div>
+
+    <div class="assessment-wrapper">
+        <!-- AI Engine status bar -->
+        <div class="ai-panel" id="aiPanel">
+            <div class="ai-indicator"><div class="ai-dot"></div> AI Engine Active</div>
+            <div class="ai-indicator">📊 Difficulty: <span class="diff-badge easy" id="diffBadge">Easy</span></div>
+            <div class="ai-indicator">✅ Correct: <span id="correctCount" style="color:var(--accent3);font-weight:900;">0</span></div>
+            <div class="ai-indicator">❌ Wrong: <span id="wrongCount" style="color:var(--accent);font-weight:900;">0</span></div>
+            <div class="ai-indicator">🔥 Streak: <span id="streakCount" style="color:var(--primary);font-weight:900;">0</span></div>
+        </div>
+
+        <!-- Subject Selection -->
+        <div id="subjectScreen">
+            <div class="section-header">
+                <span class="section-tag">Step 1</span>
+                <h2>Choose a <em>Subject</em></h2>
+                <p>Pick a subject and the AI will adapt the quiz to your level.</p>
+            </div>
+            <div class="subject-selector">
+                <div class="subj-card" onclick="selectSubject('gk')">
+                    <div class="subj-icon">🌍</div>
+                    <h3>General Knowledge</h3>
+                    <p>Science, world, animals, and fun trivia</p>
+                </div>
+                <div class="subj-card" onclick="selectSubject('math')">
+                    <div class="subj-icon">➕</div>
+                    <h3>Mathematics</h3>
+                    <p>Numbers, counting, operations, and patterns</p>
+                </div>
+                <div class="subj-card" onclick="selectSubject('english')">
+                    <div class="subj-icon">📖</div>
+                    <h3>English</h3>
+                    <p>Alphabet, words, grammar, and sentences</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quizScreen" style="display:none;">
+            <div class="progress-row" id="progressRow"></div>
+            <div class="q-card" id="qCard">
+                <div class="q-header">
+                    <span class="q-meta" id="qMeta">Question 1 of 10</span>
+                    <span class="diff-badge easy" id="qDiffBadge">Easy</span>
+                </div>
+                <div class="q-body">
+                    <div class="q-text" id="qText"></div>
+                    <div class="options-grid" id="optionsGrid"></div>
+                    <div class="feedback-banner" id="feedbackBanner"></div>
+                </div>
+                <div class="q-footer">
+                    <span class="q-counter" id="qCounter">⭐ 0 correct</span>
+                    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scoreboard -->
+        <div class="scoreboard" id="scoreboard">
+            <div class="score-circle" id="scoreCircle">
+                <div class="score-inner">
+                    <span class="score-num" id="scoreNum">0</span>
+                    <span class="score-denom" id="scoreDenom">/10</span>
+                </div>
+            </div>
+            <span class="grade-badge grade-A" id="gradeBadge">🌟 Excellent!</span>
+            <h2 id="scoreMessage" style="font-family:var(--font-display);font-size:1.6rem;margin-bottom:0.5rem;"></h2>
+            <p id="scoreSubtext" style="color:var(--text-muted);font-weight:600;margin-bottom:1.5rem;"></p>
+            <div class="ai-recommendation">
+                <div class="ai-rec-title">🤖 AI Recommendation for You</div>
+                <div class="ai-rec-text" id="aiRec"></div>
+            </div>
+            <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+                <button class="btn btn-primary" onclick="restartSameSubject()"><i class="fas fa-redo"></i> Try Again</button>
+                <a href="courses.html" class="btn btn-outline"><i class="fas fa-book-open"></i> Go to Courses</a>
+                <button class="btn btn-outline" onclick="changeSubject()"><i class="fas fa-exchange-alt"></i> Change Subject</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // ============================================================
+    //  RULE-BASED ADAPTIVE QUIZ ENGINE — Bright Minds
+    //  Algorithm: Performance-based difficulty adjustment
+    //  Rules:
+    //   - Start at EASY
+    //   - 2 consecutive correct → upgrade difficulty
+    //   - 2 consecutive wrong   → downgrade difficulty
+    //   - Track streak, score, per-question stats
+    // ============================================================
+
+    const QUESTIONS = {
+        gk: {
+            easy: [
+                { q: "What is the color of the sky? ☁️", opts: ["Blue","Green","Yellow","Red"], ans: "Blue" },
+                { q: "Which shape has 3 corners? 🔺", opts: ["Triangle","Square","Circle","Rectangle"], ans: "Triangle" },
+                { q: "What do caterpillars turn into? 🦋", opts: ["Butterflies","Bees","Ants","Moths"], ans: "Butterflies" },
+                { q: "Which bird cannot fly? 🐧", opts: ["Penguin","Sparrow","Eagle","Parrot"], ans: "Penguin" },
+                { q: "What gas do humans breathe? 💨", opts: ["Oxygen","Hydrogen","Nitrogen","Carbon dioxide"], ans: "Oxygen" },
+                { q: "What is the opposite of HOT? 🔥", opts: ["Cold","Warm","Cool","Freezing"], ans: "Cold" },
+                { q: "How many legs does a spider have? 🕷️", opts: ["8","6","4","10"], ans: "8" },
+            ],
+            medium: [
+                { q: "Which planet is known as the Red Planet? 🔴", opts: ["Mars","Earth","Jupiter","Venus"], ans: "Mars" },
+                { q: "Which ocean is the largest? 🌊", opts: ["Pacific","Atlantic","Indian","Arctic"], ans: "Pacific" },
+                { q: "What is the capital of India? 🇮🇳", opts: ["New Delhi","Mumbai","Kolkata","Chennai"], ans: "New Delhi" },
+                { q: "Which animal is called the Ship of the Desert? 🏜️", opts: ["Camel","Horse","Donkey","Zebra"], ans: "Camel" },
+                { q: "Which is the tallest mountain in the world? 🏔️", opts: ["Mount Everest","K2","Kanchenjunga","Makalu"], ans: "Mount Everest" },
+                { q: "What is water called when it turns to ice? ❄️", opts: ["Solid","Liquid","Gas","Vapor"], ans: "Solid" },
+            ],
+            hard: [
+                { q: "What is the powerhouse of the cell? 🔬", opts: ["Mitochondria","Nucleus","Ribosome","Vacuole"], ans: "Mitochondria" },
+                { q: "Which planet has the most moons? 🪐", opts: ["Saturn","Jupiter","Uranus","Neptune"], ans: "Saturn" },
+                { q: "What is the chemical symbol for water? 💧", opts: ["H₂O","CO₂","O₂","NaCl"], ans: "H₂O" },
+                { q: "How many bones does an adult human body have? 🦴", opts: ["206","208","196","212"], ans: "206" },
+                { q: "Who proposed the Theory of Relativity? 🧪", opts: ["Albert Einstein","Isaac Newton","Galileo","Darwin"], ans: "Albert Einstein" },
+            ]
+        },
+        math: {
+            easy: [
+                { q: "What is 3 + 4? 🍎", opts: ["7","6","8","9"], ans: "7" },
+                { q: "What is 10 − 4? 🧮", opts: ["6","5","7","4"], ans: "6" },
+                { q: "Count the apples: 🍎🍎🍎🍎🍎", opts: ["5","4","6","3"], ans: "5" },
+                { q: "What comes after 7? 🔢", opts: ["8","6","9","5"], ans: "8" },
+                { q: "Which is bigger: 8 or 3? 🔢", opts: ["8","3","Same","Neither"], ans: "8" },
+                { q: "How many fingers on one hand? ✋", opts: ["5","4","6","3"], ans: "5" },
+                { q: "Count: 🪙🪙🪙🪙", opts: ["4","3","5","2"], ans: "4" },
+            ],
+            medium: [
+                { q: "What is 6 × 2? ✖️", opts: ["12","10","14","8"], ans: "12" },
+                { q: "What is 15 ÷ 3? ➗", opts: ["5","4","6","3"], ans: "5" },
+                { q: "What is 5² (5 squared)?", opts: ["25","15","10","20"], ans: "25" },
+                { q: "Complete the pattern: 2, 4, 6, 8, ___", opts: ["10","9","12","11"], ans: "10" },
+                { q: "If a triangle has 3 sides, how many sides do 4 triangles have?", opts: ["12","9","15","10"], ans: "12" },
+                { q: "What is 50% of 80?", opts: ["40","30","50","20"], ans: "40" },
+            ],
+            hard: [
+                { q: "What is 12 × 15? 🧮", opts: ["180","160","150","175"], ans: "180" },
+                { q: "What is the next prime number after 7?", opts: ["11","9","10","13"], ans: "11" },
+                { q: "If x + 5 = 13, what is x?", opts: ["8","7","9","6"], ans: "8" },
+                { q: "What is the area of a rectangle 6cm × 4cm?", opts: ["24 cm²","20 cm²","18 cm²","28 cm²"], ans: "24 cm²" },
+                { q: "What is 20% of 150?", opts: ["30","25","35","20"], ans: "30" },
+            ]
+        },
+        english: {
+            easy: [
+                { q: "What is the first letter of the word 'Elephant'? 🐘", opts: ["E","A","I","O"], ans: "E" },
+                { q: "Which is a fruit? 🍎", opts: ["Apple","Potato","Onion","Carrot"], ans: "Apple" },
+                { q: "How many vowels are there in the alphabet?", opts: ["5","4","6","3"], ans: "5" },
+                { q: "What is the opposite of 'Big'? 📏", opts: ["Small","Tall","Heavy","Wide"], ans: "Small" },
+                { q: "Which word rhymes with 'CAT'? 🐱", opts: ["Bat","Dog","Bird","Fish"], ans: "Bat" },
+                { q: "What part of speech is 'Run'?", opts: ["Verb","Noun","Adjective","Pronoun"], ans: "Verb" },
+            ],
+            medium: [
+                { q: "Which sentence is correct?", opts: ["She go to school.","She goes to school.","She going to school.","She gone to school."], ans: "She goes to school." },
+                { q: "What is the plural of 'Child'? 👧", opts: ["Children","Childs","Childrens","Child"], ans: "Children" },
+                { q: "Which word means 'very happy'? 😊", opts: ["Elated","Sad","Bored","Confused"], ans: "Elated" },
+                { q: "What is a synonym for 'Big'?", opts: ["Large","Tiny","Small","Little"], ans: "Large" },
+                { q: "What type of word is 'Quickly'?", opts: ["Adverb","Noun","Verb","Adjective"], ans: "Adverb" },
+            ],
+            hard: [
+                { q: "Identify the correct sentence:", opts: ["Neither he nor I am wrong.","Neither he nor I are wrong.","Neither he nor I is wrong.","Neither he nor I was wrong."], ans: "Neither he nor I am wrong." },
+                { q: "What is the antonym of 'Benevolent'?", opts: ["Malevolent","Generous","Kind","Caring"], ans: "Malevolent" },
+                { q: "Which is the correct use of 'whom'?", opts: ["Whom did you meet?","Who did you meet with him?","Whom you met?","Who you did meet?"], ans: "Whom did you meet?" },
+                { q: "What literary device is used: 'The stars danced in the sky'?", opts: ["Personification","Simile","Metaphor","Alliteration"], ans: "Personification" },
+            ]
+        }
+    };
+
+    // ---- State -----------------------------------------------
+    let state = {
+        subject: null,
+        difficulty: 'easy',        // current level
+        questionIndex: 0,
+        totalQuestions: 10,
+        answered: 0,
+        score: 0,
+        consecutiveCorrect: 0,
+        consecutiveWrong: 0,
+        streak: 0,
+        maxStreak: 0,
+        wrongIndices: [],
+        usedQuestions: { easy: [], medium: [], hard: [] },
+        history: []                 // {q, correct, difficulty}
+    };
+
+    // ---- Rule Engine -----------------------------------------
+    function applyDifficultyRules() {
+        const { consecutiveCorrect, consecutiveWrong, difficulty } = state;
+        // Rule 1: Upgrade after 2 consecutive correct
+        if (consecutiveCorrect >= 2 && difficulty !== 'hard') {
+            state.difficulty = difficulty === 'easy' ? 'medium' : 'hard';
+            state.consecutiveCorrect = 0;
+            return 'upgraded';
+        }
+        // Rule 2: Downgrade after 2 consecutive wrong
+        if (consecutiveWrong >= 2 && difficulty !== 'easy') {
+            state.difficulty = difficulty === 'hard' ? 'medium' : 'easy';
+            state.consecutiveWrong = 0;
+            return 'downgraded';
+        }
+        return 'unchanged';
+    }
+
+    function getNextQuestion() {
+        const pool = QUESTIONS[state.subject][state.difficulty];
+        const used = state.usedQuestions[state.difficulty];
+        const available = pool.filter((_, i) => !used.includes(i));
+        if (available.length === 0) {
+            // Reset used for this difficulty if all used
+            state.usedQuestions[state.difficulty] = [];
+            return pool[Math.floor(Math.random() * pool.length)];
+        }
+        const q = available[Math.floor(Math.random() * available.length)];
+        state.usedQuestions[state.difficulty].push(pool.indexOf(q));
+        return q;
+    }
+
+    function generateAIRecommendation() {
+        const pct = (state.score / state.totalQuestions) * 100;
+        const subject = state.subject;
+        const subjectNames = { gk: 'General Knowledge', math: 'Mathematics', english: 'English' };
+        const sName = subjectNames[subject];
+
+        if (pct >= 80) {
+            return `🌟 Outstanding performance in ${sName}! The AI has detected that you're ready for advanced challenges. We recommend:\n• Moving on to harder practice sets\n• Trying a different subject to build breadth\n• Teaching a friend what you learned (the best way to reinforce knowledge!)`;
+        } else if (pct >= 60) {
+            return `👍 Good effort in ${sName}! You have a solid foundation. The AI suggests:\n• Review the questions you got wrong and understand why\n• Practice the medium-difficulty questions daily for 10 minutes\n• Use the AI Tutor to explain any concept you found confusing`;
+        } else {
+            return `💛 Keep going! ${sName} can be challenging, but you're learning! The AI recommends:\n• Start with the easy course material in ${sName}\n• Ask the AI Tutor to explain difficult concepts in simple words\n• Try the memory game to build focus and confidence\n• Every attempt makes you stronger — try again!`;
+        }
+    }
+
+    // ---- UI -------------------------------------------------
+    function selectSubject(subj) {
+        state.subject = subj;
+        state.usedQuestions = { easy: [], medium: [], hard: [] };
+        document.getElementById('subjectScreen').style.display = 'none';
+        document.getElementById('quizScreen').style.display = 'block';
+        buildProgressRow();
+        renderQuestion();
+    }
+
+    function buildProgressRow() {
+        const row = document.getElementById('progressRow');
+        row.innerHTML = Array.from({ length: state.totalQuestions }, (_, i) =>
+            `<div class="prog-dot ${i === 0 ? 'current' : ''}" id="prog-${i}"></div>`
+        ).join('');
+    }
+
+    function updateProgress(idx, correct) {
+        const dot = document.getElementById(`prog-${idx}`);
+        if (dot) dot.className = `prog-dot ${correct ? 'done-correct' : 'done-wrong'}`;
+        const next = document.getElementById(`prog-${idx + 1}`);
+        if (next) next.className = 'prog-dot current';
+    }
+
+    function renderQuestion() {
+        if (state.answered >= state.totalQuestions) { showScoreboard(); return; }
+        const q = getNextQuestion();
+        state.currentQuestion = q;
+
+        const labels = ['A', 'B', 'C', 'D'];
+        document.getElementById('qText').textContent = q.q;
+        document.getElementById('qMeta').textContent = `Question ${state.answered + 1} of ${state.totalQuestions}`;
+        updateDiffBadge();
+
+        const grid = document.getElementById('optionsGrid');
+        grid.innerHTML = q.opts.map((opt, i) =>
+            `<button class="opt" onclick="selectAnswer(this, '${opt.replace(/'/g, "\\'")}', '${q.ans.replace(/'/g, "\\'")}', ${i})">${labels[i]}. ${opt}</button>`
+        ).join('');
+
+        document.getElementById('feedbackBanner').className = 'feedback-banner';
+        document.getElementById('nextBtn').className = 'next-btn';
+    }
+
+    function updateDiffBadge() {
+        const labels = { easy: '🟢 Easy', medium: '🟡 Medium', hard: '🔴 Hard' };
+        [document.getElementById('diffBadge'), document.getElementById('qDiffBadge')].forEach(el => {
+            if (!el) return;
+            el.textContent = labels[state.difficulty];
+            el.className = `diff-badge ${state.difficulty}`;
+        });
+    }
+
+    function selectAnswer(btn, selected, correct, optIdx) {
+        // Disable all options
+        document.querySelectorAll('.opt').forEach(b => b.disabled = true);
+
+        const isCorrect = selected === correct;
+        btn.className = `opt ${isCorrect ? 'selected-correct' : 'selected-wrong'}`;
+
+        // Reveal correct answer if wrong
+        if (!isCorrect) {
+            document.querySelectorAll('.opt').forEach(b => {
+                const label = b.textContent.substring(3); // strip "A. "
+                if (b.textContent.endsWith(correct)) b.classList.add('reveal-correct');
+            });
+        }
+
+        // Update state
+        if (isCorrect) {
+            state.score++;
+            state.consecutiveCorrect++;
+            state.consecutiveWrong = 0;
+            state.streak++;
+            if (state.streak > state.maxStreak) state.maxStreak = state.streak;
+        } else {
+            state.consecutiveWrong++;
+            state.consecutiveCorrect = 0;
+            state.streak = 0;
+        }
+
+        state.history.push({ correct: isCorrect, difficulty: state.difficulty });
+        updateProgress(state.answered, isCorrect);
+        state.answered++;
+
+        // Feedback
+        const fb = document.getElementById('feedbackBanner');
+        if (isCorrect) {
+            const praise = ['Brilliant! 🌟', 'Correct! 🎉', 'Amazing! ✅', 'Right on! 🏆', 'Spot on! 💯'];
+            fb.textContent = praise[Math.floor(Math.random() * praise.length)];
+            fb.className = 'feedback-banner correct';
+        } else {
+            fb.textContent = `✗ Not quite! The correct answer is: ${correct}`;
+            fb.className = 'feedback-banner wrong';
+        }
+
+        // Apply AI difficulty rules
+        applyDifficultyRules();
+        updateDiffBadge();
+
+        // Update counters
+        document.getElementById('correctCount').textContent = state.score;
+        document.getElementById('wrongCount').textContent = state.answered - state.score;
+        document.getElementById('streakCount').textContent = state.streak;
+        document.getElementById('qCounter').textContent = `⭐ ${state.score} correct`;
+
+        // Show next button
+        document.getElementById('nextBtn').className = 'next-btn visible';
+    }
+
+    function nextQuestion() {
+        if (state.answered >= state.totalQuestions) { showScoreboard(); return; }
+        renderQuestion();
+    }
+
+    function showScoreboard() {
+        document.getElementById('quizScreen').style.display = 'none';
+        const sb = document.getElementById('scoreboard');
+        sb.style.display = 'block';
+
+        const pct = Math.round((state.score / state.totalQuestions) * 100);
+        document.getElementById('scoreNum').textContent = state.score;
+        document.getElementById('scoreDenom').textContent = `/ ${state.totalQuestions}`;
+        document.getElementById('scoreCircle').style.setProperty('--p', `${pct}%`);
+
+        let grade, gradeClass, msg, sub;
+        if (pct >= 80) { grade = '🌟 Excellent!'; gradeClass = 'grade-A'; msg = 'Outstanding work!'; sub = `You scored ${pct}%! You're a star learner.`; }
+        else if (pct >= 60) { grade = '👍 Good Job!'; gradeClass = 'grade-B'; msg = 'Well done!'; sub = `You scored ${pct}%. Keep practicing to reach the top!`; }
+        else { grade = '💪 Keep Going!'; gradeClass = 'grade-C'; msg = 'Good effort!'; sub = `You scored ${pct}%. Every attempt makes you better!`; }
+
+        document.getElementById('gradeBadge').textContent = grade;
+        document.getElementById('gradeBadge').className = `grade-badge ${gradeClass}`;
+        document.getElementById('scoreMessage').textContent = msg;
+        document.getElementById('scoreSubtext').textContent = sub;
+        document.getElementById('aiRec').textContent = generateAIRecommendation();
+    }
+
+    function restartSameSubject() {
+        state = { ...state, difficulty: 'easy', questionIndex: 0, answered: 0, score: 0, consecutiveCorrect: 0, consecutiveWrong: 0, streak: 0, maxStreak: 0, usedQuestions: { easy: [], medium: [], hard: [] }, history: [] };
+        document.getElementById('scoreboard').style.display = 'none';
+        document.getElementById('quizScreen').style.display = 'block';
+        document.getElementById('correctCount').textContent = '0';
+        document.getElementById('wrongCount').textContent = '0';
+        document.getElementById('streakCount').textContent = '0';
+        buildProgressRow();
+        renderQuestion();
+    }
+
+    function changeSubject() {
+        state = { subject: null, difficulty: 'easy', questionIndex: 0, totalQuestions: 10, answered: 0, score: 0, consecutiveCorrect: 0, consecutiveWrong: 0, streak: 0, maxStreak: 0, usedQuestions: { easy: [], medium: [], hard: [] }, history: [] };
+        document.getElementById('scoreboard').style.display = 'none';
+        document.getElementById('quizScreen').style.display = 'none';
+        document.getElementById('subjectScreen').style.display = 'block';
+        document.getElementById('correctCount').textContent = '0';
+        document.getElementById('wrongCount').textContent = '0';
+        document.getElementById('streakCount').textContent = '0';
+        document.getElementById('diffBadge').textContent = '🟢 Easy';
+        document.getElementById('diffBadge').className = 'diff-badge easy';
+    }
+    </script>
+</body>
+</html>

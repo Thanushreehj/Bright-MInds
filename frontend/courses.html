@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courses – Bright Minds</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { background: var(--bg); }
+        .courses-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+        .course-card {
+            background: white; border-radius: var(--radius); box-shadow: var(--shadow);
+            overflow: hidden; transition: var(--transition); border: 2px solid var(--border);
+        }
+        .course-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-hover); }
+        .course-banner { height: 120px; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; }
+        .banner-math   { background: linear-gradient(135deg, #FFF5F5, #FFD6D6); }
+        .banner-eng    { background: linear-gradient(135deg, #F0FFF4, #B7EFC5); }
+        .banner-gk     { background: linear-gradient(135deg, #FFF8E1, #FFE082); }
+        .course-body   { padding: 1.5rem; }
+        .course-body h3 { font-family: var(--font-display); font-size: 1.3rem; font-weight: 800; margin-bottom: 0.4rem; }
+        .course-body p  { font-size: 0.88rem; color: var(--text-muted); font-weight: 600; margin-bottom: 1rem; line-height: 1.7; }
+        .level-badge { display: inline-block; padding: 0.25rem 0.7rem; border-radius: 50px; font-size: 0.75rem; font-weight: 800; margin-bottom: 1rem; }
+        .level-beginner { background: #E8F5E9; color: #2E7D32; }
+        .level-inter    { background: #FFF8E1; color: #F57C00; }
+        .lesson-list    { list-style: none; margin-bottom: 1.5rem; }
+        .lesson-list li { display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; font-weight: 700; padding: 0.35rem 0; border-bottom: 1px dashed var(--border); color: var(--text-muted); }
+        .lesson-list li::before { content: '📌'; font-size: 0.8rem; }
+        .course-btn { width: 100%; padding: 0.8rem; border-radius: 50px; background: var(--primary); color: white; border: none; font-family: var(--font-body); font-size: 0.9rem; font-weight: 800; cursor: pointer; transition: var(--transition); }
+        .course-btn:hover { background: var(--primary-dark); transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-logo"><span class="logo-icon">🧠</span><span class="logo-text">Bright<strong>Minds</strong></span></div>
+        <nav><ul class="nav-links">
+            <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="courses.html" class="active"><i class="fas fa-book-open"></i> Courses</a></li>
+            <li><a href="games.html"><i class="fas fa-gamepad"></i> Games</a></li>
+            <li><a href="assessment.html"><i class="fas fa-brain"></i> Assessment</a></li>
+            <li><a href="chatbot.html"><i class="fas fa-robot"></i> AI Tutor</a></li>
+            <li><a href="disability.html"><i class="fas fa-heart"></i> Awareness</a></li>
+            <li><a href="about.html"><i class="fas fa-users"></i> About</a></li>
+        </ul></nav>
+    </header>
+
+    <div class="page-hero">
+        <h1>📚 Learning Courses</h1>
+        <p>Structured lessons designed with special needs learners in mind. Go at your own pace!</p>
+    </div>
+
+    <div class="container">
+        <div class="section-header" style="margin-bottom:2rem;">
+            <span class="section-tag">All Subjects</span>
+            <h2>Choose Your <em>Course</em></h2>
+            <p>Not sure where to start? Take the <a href="assessment.html" style="color:var(--primary);font-weight:700;">AI Assessment</a> and we'll recommend one for you!</p>
+        </div>
+        <div class="courses-grid">
+            <!-- Math -->
+            <div class="course-card">
+                <div class="course-banner banner-math">➕</div>
+                <div class="course-body">
+                    <span class="level-badge level-beginner">Beginner Friendly</span>
+                    <h3>Mathematics</h3>
+                    <p>Build a strong number sense and math confidence through fun, step-by-step lessons with visual examples.</p>
+                    <ul class="lesson-list">
+                        <li>Counting 1–20 with emojis</li>
+                        <li>Addition & Subtraction</li>
+                        <li>Patterns & Sequences</li>
+                        <li>Word Problems</li>
+                        <li>Multiplication Tables</li>
+                    </ul>
+                    <a href="assessment.html"><button class="course-btn">Start Math Quiz 🎯</button></a>
+                </div>
+            </div>
+            <!-- English -->
+            <div class="course-card">
+                <div class="course-banner banner-eng">📖</div>
+                <div class="course-body">
+                    <span class="level-badge level-beginner">Beginner Friendly</span>
+                    <h3>English Language</h3>
+                    <p>From alphabet to full sentences — build reading, writing, and communication skills in a joyful way.</p>
+                    <ul class="lesson-list">
+                        <li>Alphabet & Phonics</li>
+                        <li>Sight Words</li>
+                        <li>Grammar Basics</li>
+                        <li>Vocabulary Building</li>
+                        <li>Storytelling</li>
+                    </ul>
+                    <a href="assessment.html"><button class="course-btn">Start English Quiz 🎯</button></a>
+                </div>
+            </div>
+            <!-- GK -->
+            <div class="course-card">
+                <div class="course-banner banner-gk">🌍</div>
+                <div class="course-body">
+                    <span class="level-badge level-inter">Intermediate</span>
+                    <h3>General Knowledge</h3>
+                    <p>Explore science, the world, animals, and amazing facts that spark curiosity and wonder in children.</p>
+                    <ul class="lesson-list">
+                        <li>Science Basics</li>
+                        <li>World Geography</li>
+                        <li>Animals & Nature</li>
+                        <li>Fun History Facts</li>
+                        <li>Space & Universe</li>
+                    </ul>
+                    <a href="assessment.html"><button class="course-btn">Start GK Quiz 🎯</button></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Recommendation Banner -->
+        <div style="margin-top:3rem;background:linear-gradient(135deg,var(--primary),var(--primary-dark));border-radius:var(--radius);padding:2.5rem;color:white;text-align:center;">
+            <h2 style="font-family:var(--font-display);font-size:1.8rem;font-weight:900;margin-bottom:0.8rem;">Not sure where to start? 🤔</h2>
+            <p style="font-size:1rem;opacity:0.9;font-weight:600;margin-bottom:1.5rem;max-width:500px;margin-left:auto;margin-right:auto;">Take our 10-question AI Assessment and our rule-based engine will build a personalized learning path just for your child.</p>
+            <a href="assessment.html" class="btn btn-outline" style="border-color:white;color:white;display:inline-flex;">
+                <i class="fas fa-magic"></i> Take AI Assessment
+            </a>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-top">
+            <div class="footer-brand">
+                <span class="logo-text">Bright<strong>Minds</strong></span>
+                <p>Together, we illuminate the path to learning.</p>
+            </div>
+            <div class="footer-links"><h4>Platform</h4><ul>
+                <li><a href="courses.html">Courses</a></li>
+                <li><a href="games.html">Games</a></li>
+                <li><a href="assessment.html">AI Assessment</a></li>
+            </ul></div>
+        </div>
+        <div class="footer-bottom"><p>© 2024 Bright Minds. Made with ❤️ for every child.</p></div>
+    </footer>
+</body>
+</html>

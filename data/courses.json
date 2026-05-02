@@ -1,0 +1,66 @@
+{
+  "courses": [
+    {
+      "id": "math_101",
+      "title": "Mathematics",
+      "icon": "➕",
+      "color": "#FFF5F5",
+      "level": "Beginner",
+      "description": "Build a strong foundation in numbers, operations, and problem-solving.",
+      "lessons": [
+        "Counting 1-20",
+        "Addition & Subtraction",
+        "Multiplication Tables",
+        "Division Basics",
+        "Word Problems",
+        "Fractions",
+        "Geometry"
+      ],
+      "duration": "6 weeks",
+      "difficulty": "beginner"
+    },
+    {
+      "id": "english_101",
+      "title": "English Language",
+      "icon": "📖",
+      "color": "#F0FFF4",
+      "level": "Beginner",
+      "description": "Develop reading, writing, speaking, and listening skills.",
+      "lessons": [
+        "Alphabet & Phonics",
+        "Sight Words",
+        "Grammar Basics",
+        "Sentence Construction",
+        "Reading Comprehension",
+        "Creative Writing",
+        "Vocabulary Building"
+      ],
+      "duration": "6 weeks",
+      "difficulty": "beginner"
+    },
+    {
+      "id": "gk_101",
+      "title": "General Knowledge",
+      "icon": "🌍",
+      "color": "#FFF8E1",
+      "level": "Intermediate",
+      "description": "Explore science, geography, history, and fun facts about the world.",
+      "lessons": [
+        "Animals & Nature",
+        "Solar System",
+        "Countries & Capitals",
+        "Famous Inventors",
+        "Science Basics",
+        "World Wonders",
+        "Fun Trivia"
+      ],
+      "duration": "4 weeks",
+      "difficulty": "intermediate"
+    }
+  ],
+  "recommendations": {
+    "visual": ["math_101", "gk_101"],
+    "auditory": ["english_101", "gk_101"],
+    "kinesthetic": ["math_101", "english_101"]
+  }
+}

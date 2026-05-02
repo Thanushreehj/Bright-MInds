@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Games – Bright Minds</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { background: var(--bg); }
+        .games-container { max-width: 900px; margin: 0 auto; padding: 2rem; }
+
+        /* Game Selector */
+        .game-tabs { display: flex; gap: 0.75rem; margin-bottom: 2rem; flex-wrap: wrap; }
+        .game-tab {
+            padding: 0.7rem 1.4rem; border-radius: 50px;
+            border: 2.5px solid var(--border);
+            background: white; font-family: var(--font-body);
+            font-size: 0.9rem; font-weight: 800; cursor: pointer;
+            transition: var(--transition); color: var(--text-muted);
+        }
+        .game-tab:hover, .game-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* ===== MEMORY GAME ===== */
+        .memory-game { display: none; }
+        .memory-game.active { display: block; }
+        .game-controls { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .game-stat { background: white; border-radius: var(--radius-sm); padding: 0.6rem 1.2rem; border: 2px solid var(--border); font-weight: 800; font-size: 0.9rem; }
+        .game-stat span { color: var(--primary); }
+        .start-btn { padding: 0.7rem 1.8rem; border-radius: 50px; background: var(--primary); color: white; border: none; font-family: var(--font-body); font-size: 0.9rem; font-weight: 800; cursor: pointer; transition: var(--transition); }
+        .start-btn:hover { background: var(--primary-dark); transform: translateY(-2px); }
+        .memory-board {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem;
+        }
+        .mem-card {
+            aspect-ratio: 1; border-radius: var(--radius-sm); cursor: pointer;
+            perspective: 600px; position: relative;
+        }
+        .mem-inner { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.5s; }
+        .mem-card.flipped .mem-inner { transform: rotateY(180deg); }
+        .mem-front, .mem-back {
+            position: absolute; inset: 0; border-radius: var(--radius-sm);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; backface-visibility: hidden;
+            border: 2px solid var(--border);
+        }
+        .mem-front { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; font-size: 1.5rem; box-shadow: var(--shadow); }
+        .mem-back { background: white; transform: rotateY(180deg); box-shadow: var(--shadow); }
+        .mem-card.matched .mem-front, .mem-card.matched .mem-back { border-color: var(--accent3); background: #E8F5E9; }
+        .win-banner { display: none; background: linear-gradient(135deg, var(--accent3), #2E7D32); color: white; border-radius: var(--radius); padding: 1.5rem; text-align: center; margin-top: 1.5rem; }
+        .win-banner.visible { display: block; animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+        .win-banner h2 { font-family: var(--font-display); font-size: 1.6rem; font-weight: 900; }
+
+        /* ===== WORD SCRAMBLE ===== */
+        .word-game { display: none; }
+        .word-game.active { display: block; }
+        .word-card { background: white; border-radius: var(--radius); box-shadow: var(--shadow); padding: 2.5rem; text-align: center; max-width: 550px; margin: 0 auto; }
+        .scrambled-word { font-family: var(--font-display); font-size: 3rem; font-weight: 900; color: var(--primary); letter-spacing: 8px; margin: 1rem 0; }
+        .word-hint { font-size: 0.9rem; color: var(--text-muted); font-weight: 600; margin-bottom: 1.5rem; }
+        .word-input-row { display: flex; gap: 0.7rem; justify-content: center; }
+        .word-input {
+            padding: 0.85rem 1.2rem; border: 2.5px solid var(--border); border-radius: 50px;
+            font-family: var(--font-display); font-size: 1.2rem; font-weight: 800; text-align: center;
+            outline: none; width: 200px; text-transform: uppercase; transition: border 0.2s;
+        }
+        .word-input:focus { border-color: var(--primary); }
+        .check-btn { padding: 0.85rem 1.5rem; border-radius: 50px; background: var(--primary); color: white; border: none; font-family: var(--font-body); font-size: 0.9rem; font-weight: 800; cursor: pointer; transition: var(--transition); }
+        .check-btn:hover { background: var(--primary-dark); transform: translateY(-2px); }
+        .word-feedback { margin-top: 1rem; font-weight: 800; font-size: 1rem; min-height: 28px; }
+        .word-feedback.correct { color: var(--accent3); }
+        .word-feedback.wrong   { color: var(--accent); }
+        .word-progress { display: flex; align-items: center; justify-content: space-between; margin-top: 1.5rem; padding-top: 1rem; border-top: 2px solid var(--border); font-weight: 700; font-size: 0.85rem; color: var(--text-muted); }
+        .skip-btn { padding: 0.4rem 1rem; border-radius: 50px; border: 2px solid var(--border); background: white; font-family: var(--font-body); font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: var(--transition); }
+        .skip-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+        /* ===== PATTERN GAME ===== */
+        .pattern-game { display: none; }
+        .pattern-game.active { display: block; }
+        .pattern-card { background: white; border-radius: var(--radius); box-shadow: var(--shadow); padding: 2rem; max-width: 650px; margin: 0 auto; }
+        .pattern-display { display: flex; align-items: center; gap: 0.75rem; font-size: 2rem; flex-wrap: wrap; margin: 1.5rem 0; min-height: 70px; background: var(--bg); border-radius: var(--radius-sm); padding: 1rem; }
+        .pattern-item { width: 56px; height: 56px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; background: white; border: 2px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .pattern-blank { background: #F3F0FF; border: 2.5px dashed var(--primary); color: var(--primary); font-size: 1.5rem; font-weight: 900; }
+        .pattern-options { display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; margin: 1.5rem 0; }
+        .patt-opt {
+            width: 70px; height: 70px; border-radius: var(--radius-sm); border: 2.5px solid var(--border);
+            background: white; font-size: 2rem; cursor: pointer; transition: var(--transition);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .patt-opt:hover:not(:disabled) { border-color: var(--primary); background: #F3F0FF; transform: scale(1.1); }
+        .patt-opt.selected-correct { border-color: var(--accent3); background: #E8F5E9; }
+        .patt-opt.selected-wrong   { border-color: var(--accent); background: #FFEBEE; }
+        .pattern-feedback { text-align: center; font-weight: 800; font-size: 1rem; min-height: 28px; }
+
+        @media(max-width:600px) { .memory-board { grid-template-columns: repeat(3, 1fr); } }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-logo"><span class="logo-icon">🧠</span><span class="logo-text">Bright<strong>Minds</strong></span></div>
+        <nav><ul class="nav-links">
+            <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="courses.html"><i class="fas fa-book-open"></i> Courses</a></li>
+            <li><a href="games.html" class="active"><i class="fas fa-gamepad"></i> Games</a></li>
+            <li><a href="assessment.html"><i class="fas fa-brain"></i> Assessment</a></li>
+            <li><a href="chatbot.html"><i class="fas fa-robot"></i> AI Tutor</a></li>
+        </ul></nav>
+    </header>
+
+    <div class="page-hero">
+        <h1>🎮 Learning Games</h1>
+        <p>Fun activities designed for children with different learning styles. Games build focus, memory, and cognition!</p>
+    </div>
+
+    <div class="games-container">
+        <div class="game-tabs">
+            <button class="game-tab active" onclick="switchGame('memory', this)">🃏 Memory Match</button>
+            <button class="game-tab" onclick="switchGame('word', this)">🔤 Word Scramble</button>
+            <button class="game-tab" onclick="switchGame('pattern', this)">🔢 Pattern Play</button>
+        </div>
+
+        <!-- ===== MEMORY GAME ===== -->
+        <div class="memory-game active" id="memoryGame">
+            <div class="game-controls">
+                <button class="start-btn" onclick="initMemory()"><i class="fas fa-play"></i> New Game</button>
+                <div class="game-stat">Moves: <span id="moveCount">0</span></div>
+                <div class="game-stat">Pairs: <span id="pairCount">0</span> / 8</div>
+                <div class="game-stat">Time: <span id="timer">0s</span></div>
+            </div>
+            <div class="memory-board" id="memoryBoard"></div>
+            <div class="win-banner" id="winBanner">
+                <h2>🎉 You Won!</h2>
+                <p id="winStats" style="font-weight:700;margin-top:0.5rem;"></p>
+            </div>
+        </div>
+
+        <!-- ===== WORD SCRAMBLE ===== -->
+        <div class="word-game" id="wordGame">
+            <div class="word-card">
+                <p style="font-size:0.82rem;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;">Word Scramble</p>
+                <div class="scrambled-word" id="scrambledWord">-</div>
+                <div class="word-hint" id="wordHint">Hint: —</div>
+                <div class="word-input-row">
+                    <input type="text" class="word-input" id="wordAnswer" placeholder="TYPE ANSWER" onkeypress="if(event.key==='Enter')checkWord()">
+                    <button class="check-btn" onclick="checkWord()">Check ✓</button>
+                </div>
+                <div class="word-feedback" id="wordFeedback"></div>
+                <div class="word-progress">
+                    <span>Score: <strong id="wordScore">0</strong></span>
+                    <button class="skip-btn" onclick="nextWord()">Skip →</button>
+                    <span>Word <strong id="wordNum">1</strong> of 15</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== PATTERN GAME ===== -->
+        <div class="pattern-game" id="patternGame">
+            <div class="pattern-card">
+                <p style="font-size:0.82rem;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;">Pattern Recognition</p>
+                <h3 style="font-family:var(--font-display);font-size:1.1rem;margin-top:0.5rem;" id="patternQuestion">What comes next in the pattern?</h3>
+                <div class="pattern-display" id="patternDisplay"></div>
+                <p style="font-weight:700;color:var(--text-muted);font-size:0.88rem;margin-bottom:0.5rem;">Choose the correct answer:</p>
+                <div class="pattern-options" id="patternOptions"></div>
+                <div class="pattern-feedback" id="patternFeedback"></div>
+                <div class="word-progress" style="margin-top:1.5rem;">
+                    <span>Score: <strong id="patternScore">0</strong></span>
+                    <span>Level <strong id="patternLevel">1</strong> of 10</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function switchGame(game, tab) {
+        document.querySelectorAll('.game-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelectorAll('.memory-game,.word-game,.pattern-game').forEach(g => g.classList.remove('active'));
+        document.getElementById(game + 'Game').classList.add('active');
+        if (game === 'word') initWords();
+        if (game === 'pattern') initPatterns();
+    }
+
+    // ===== MEMORY GAME =====
+    const EMOJIS = ['🌟','🦋','🎈','🌸','🐢','🦁','🍎','🎵'];
+    let memState = { flipped: [], matched: 0, moves: 0, locked: false, timerInterval: null, seconds: 0 };
+
+    function initMemory() {
+        clearInterval(memState.timerInterval);
+        memState = { flipped: [], matched: 0, moves: 0, locked: false, timerInterval: null, seconds: 0 };
+        document.getElementById('moveCount').textContent = '0';
+        document.getElementById('pairCount').textContent = '0';
+        document.getElementById('timer').textContent = '0s';
+        document.getElementById('winBanner').classList.remove('visible');
+
+        const pairs = [...EMOJIS, ...EMOJIS].sort(() => Math.random() - 0.5);
+        const board = document.getElementById('memoryBoard');
+        board.innerHTML = pairs.map((e, i) => `
+            <div class="mem-card" id="mc-${i}" onclick="flipCard(${i}, '${e}')">
+                <div class="mem-inner">
+                    <div class="mem-front">🧠</div>
+                    <div class="mem-back">${e}</div>
+                </div>
+            </div>
+        `).join('');
+
+        memState.timerInterval = setInterval(() => {
+            memState.seconds++;
+            document.getElementById('timer').textContent = memState.seconds + 's';
+        }, 1000);
+    }
+
+    function flipCard(id, emoji) {
+        if (memState.locked) return;
+        const card = document.getElementById(`mc-${id}`);
+        if (card.classList.contains('flipped') || card.classList.contains('matched')) return;
+
+        card.classList.add('flipped');
+        memState.flipped.push({ id, emoji });
+
+        if (memState.flipped.length === 2) {
+            memState.locked = true;
+            memState.moves++;
+            document.getElementById('moveCount').textContent = memState.moves;
+
+            const [a, b] = memState.flipped;
+            if (a.emoji === b.emoji) {
+                document.getElementById(`mc-${a.id}`).classList.add('matched');
+                document.getElementById(`mc-${b.id}`).classList.add('matched');
+                memState.matched++;
+                document.getElementById('pairCount').textContent = memState.matched;
+                memState.flipped = [];
+                memState.locked = false;
+                if (memState.matched === 8) {
+                    clearInterval(memState.timerInterval);
+                    const banner = document.getElementById('winBanner');
+                    document.getElementById('winStats').textContent = `Completed in ${memState.moves} moves and ${memState.seconds} seconds!`;
+                    banner.classList.add('visible');
+                }
+            } else {
+                setTimeout(() => {
+                    document.getElementById(`mc-${a.id}`).classList.remove('flipped');
+                    document.getElementById(`mc-${b.id}`).classList.remove('flipped');
+                    memState.flipped = [];
+                    memState.locked = false;
+                }, 1000);
+            }
+        }
+    }
+
+    // Auto-start memory game
+    initMemory();
+
+    // ===== WORD SCRAMBLE =====
+    const WORDS = [
+        { word: 'APPLE',    hint: '🍎 A red or green fruit' },
+        { word: 'TIGER',    hint: '🐯 A big striped wild cat' },
+        { word: 'SCHOOL',   hint: '🏫 A place where we learn' },
+        { word: 'WATER',    hint: '💧 We drink this every day' },
+        { word: 'PENCIL',   hint: '✏️ Used for writing' },
+        { word: 'ELEPHANT', hint: '🐘 The largest land animal' },
+        { word: 'PLANET',   hint: '🪐 Earth is one of these' },
+        { word: 'RAINBOW',  hint: '🌈 Appears after rain' },
+        { word: 'BALLOON',  hint: '🎈 Filled with air or helium' },
+        { word: 'FLOWER',   hint: '🌸 Part of a plant, often colorful' },
+        { word: 'BUTTER',   hint: '🧈 Yellow spread for bread' },
+        { word: 'BRIDGE',   hint: '🌉 Connects two places over water' },
+        { word: 'MIRROR',   hint: '🪞 You see your reflection in it' },
+        { word: 'CANDLE',   hint: '🕯️ Gives light when lit' },
+        { word: 'BASKET',   hint: '🧺 Used to carry things' },
+    ];
+
+    let wordState = { index: 0, score: 0, words: [] };
+
+    function scramble(word) {
+        const arr = word.split('');
+        do { arr.sort(() => Math.random() - 0.5); } while (arr.join('') === word);
+        return arr.join('');
+    }
+
+    function initWords() {
+        wordState.words = [...WORDS].sort(() => Math.random() - 0.5).slice(0, 15);
+        wordState.index = 0;
+        wordState.score = 0;
+        renderWord();
+    }
+
+    function renderWord() {
+        const w = wordState.words[wordState.index];
+        document.getElementById('scrambledWord').textContent = scramble(w.word);
+        document.getElementById('wordHint').textContent = `Hint: ${w.hint}`;
+        document.getElementById('wordAnswer').value = '';
+        document.getElementById('wordFeedback').textContent = '';
+        document.getElementById('wordFeedback').className = 'word-feedback';
+        document.getElementById('wordNum').textContent = wordState.index + 1;
+        document.getElementById('wordScore').textContent = wordState.score;
+        document.getElementById('wordAnswer').focus();
+    }
+
+    function checkWord() {
+        const answer = document.getElementById('wordAnswer').value.trim().toUpperCase();
+        const correct = wordState.words[wordState.index].word;
+        const fb = document.getElementById('wordFeedback');
+        if (answer === correct) {
+            fb.textContent = '🎉 Correct! Well done!';
+            fb.className = 'word-feedback correct';
+            wordState.score++;
+            setTimeout(nextWord, 1200);
+        } else {
+            fb.textContent = `✗ Try again! (Answer: ${correct})`;
+            fb.className = 'word-feedback wrong';
+        }
+    }
+
+    function nextWord() {
+        wordState.index++;
+        if (wordState.index >= wordState.words.length) {
+            document.getElementById('scrambledWord').textContent = '🎊';
+            document.getElementById('wordHint').textContent = `Quiz complete! Score: ${wordState.score}/${wordState.words.length}`;
+            document.getElementById('wordAnswer').style.display = 'none';
+            document.getElementById('wordFeedback').textContent = `You got ${wordState.score} correct! Amazing!`;
+            document.getElementById('wordFeedback').className = 'word-feedback correct';
+            return;
+        }
+        renderWord();
+    }
+
+    // ===== PATTERN GAME =====
+    const PATTERNS = [
+        { seq: ['🍎','🍌','🍎','🍌','🍎'], ans: '🍌', opts: ['🍌','🍎','🍇','🍊'], hint: 'Apple, Banana alternating' },
+        { seq: ['🔴','🔵','🔴','🔵','🔴'], ans: '🔵', opts: ['🟡','🔴','🔵','🟢'], hint: 'Red, Blue alternating' },
+        { seq: ['⭐','⭐','🌙','⭐','⭐'], ans: '🌙', opts: ['☀️','🌙','⭐','🌟'], hint: 'Two stars then moon' },
+        { seq: ['🐱','🐶','🐱','🐶','🐱'], ans: '🐶', opts: ['🐱','🐶','🐰','🐸'], hint: 'Cat, Dog alternating' },
+        { seq: ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣'], ans: '6️⃣', opts: ['6️⃣','7️⃣','8️⃣','0️⃣'], hint: 'Counting sequence' },
+        { seq: ['🌧️','☀️','🌧️','☀️','🌧️'], ans: '☀️', opts: ['🌈','🌧️','⛅','☀️'], hint: 'Rain, Sun alternating' },
+        { seq: ['🔺','🔷','🔺','🔷','🔺'], ans: '🔷', opts: ['🔶','🔺','🔷','⬛'], hint: 'Triangle, Diamond alternating' },
+        { seq: ['🌸','🌸','🍀','🌸','🌸'], ans: '🍀', opts: ['🌸','🌺','🍀','🌻'], hint: 'Two flowers then clover' },
+        { seq: ['🐘','🦁','🐘','🦁','🐘'], ans: '🦁', opts: ['🦊','🐘','🦁','🐻'], hint: 'Elephant, Lion alternating' },
+        { seq: ['💛','💛','💙','💛','💛'], ans: '💙', opts: ['💚','💛','❤️','💙'], hint: 'Two yellow, one blue' },
+    ];
+
+    let patternState = { index: 0, score: 0 };
+
+    function initPatterns() {
+        patternState = { index: 0, score: 0 };
+        renderPattern();
+    }
+
+    function renderPattern() {
+        if (patternState.index >= PATTERNS.length) {
+            document.getElementById('patternDisplay').innerHTML = '<span style="font-size:2rem">🎊</span>';
+            document.getElementById('patternOptions').innerHTML = '';
+            document.getElementById('patternFeedback').textContent = `Game complete! Score: ${patternState.score}/${PATTERNS.length}`;
+            document.getElementById('patternFeedback').style.color = 'var(--accent3)';
+            return;
+        }
+        const p = PATTERNS[patternState.index];
+        document.getElementById('patternLevel').textContent = patternState.index + 1;
+        document.getElementById('patternScore').textContent = patternState.score;
+
+        const display = document.getElementById('patternDisplay');
+        display.innerHTML = [
+            ...p.seq.map(e => `<div class="pattern-item">${e}</div>`),
+            `<div class="pattern-item pattern-blank">?</div>`
+        ].join('');
+
+        const opts = [...p.opts].sort(() => Math.random() - 0.5);
+        document.getElementById('patternOptions').innerHTML = opts.map(opt =>
+            `<button class="patt-opt" onclick="checkPattern(this,'${opt}','${p.ans}')">${opt}</button>`
+        ).join('');
+
+        document.getElementById('patternFeedback').textContent = '';
+        document.getElementById('patternFeedback').style.color = '';
+    }
+
+    function checkPattern(btn, selected, correct) {
+        document.querySelectorAll('.patt-opt').forEach(b => b.disabled = true);
+        const isCorrect = selected === correct;
+        btn.className = `patt-opt ${isCorrect ? 'selected-correct' : 'selected-wrong'}`;
+
+        const fb = document.getElementById('patternFeedback');
+        if (isCorrect) {
+            fb.textContent = '🎉 Correct!';
+            fb.style.color = 'var(--accent3)';
+            patternState.score++;
+        } else {
+            fb.textContent = `✗ The answer was ${correct}`;
+            fb.style.color = 'var(--accent)';
+        }
+        patternState.index++;
+        setTimeout(renderPattern, 1500);
+    }
+    </script>
+</body>
+</html>

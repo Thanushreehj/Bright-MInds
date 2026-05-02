@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us – Bright Minds</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* ===== MISSION ===== */
+        .mission-section {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 3rem 2rem 0;
+            text-align: center;
+        }
+        .mission-section p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            line-height: 1.9;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* ===== VALUES GRID ===== */
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin: 3rem 0;
+        }
+        .value-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 2rem 1.8rem;
+            box-shadow: var(--shadow);
+            border: 2px solid var(--border);
+            text-align: center;
+            transition: var(--transition);
+        }
+        .value-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-hover); }
+        .value-icon { font-size: 2.8rem; margin-bottom: 1rem; }
+        .value-card h3 { font-family: var(--font-display); font-size: 1.15rem; font-weight: 900; margin-bottom: 0.6rem; }
+        .value-card p { font-size: 0.88rem; color: var(--text-muted); font-weight: 600; line-height: 1.7; }
+
+        /* ===== STORY SECTION ===== */
+        .story-section {
+            background: linear-gradient(135deg, #F3F0FF 0%, #FFF5F5 100%);
+            padding: 4rem 2rem;
+        }
+        .story-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+        .story-text h2 { font-family: var(--font-display); font-size: 2rem; font-weight: 900; margin-bottom: 1.2rem; }
+        .story-text h2 em { font-style: normal; color: var(--primary); }
+        .story-text p { font-size: 0.95rem; color: var(--text-muted); font-weight: 600; line-height: 1.9; margin-bottom: 1rem; }
+        .story-visual {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .story-stat-card {
+            background: white;
+            border-radius: var(--radius-sm);
+            padding: 1.2rem 1.5rem;
+            box-shadow: var(--shadow);
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .story-stat-num { font-family: var(--font-display); font-size: 2rem; font-weight: 900; color: var(--primary); flex-shrink: 0; }
+        .story-stat-label { font-size: 0.88rem; font-weight: 700; color: var(--text-muted); }
+
+        /* ===== MILESTONES TIMELINE ===== */
+        .milestones-section {
+            padding: 4rem 2rem;
+            background: white;
+        }
+        .timeline {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--primary), var(--accent), var(--primary));
+            border-radius: 3px;
+        }
+        .timeline-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        .timeline-item.left {
+            flex-direction: row;
+        }
+        .timeline-item.right {
+            flex-direction: row-reverse;
+        }
+        .timeline-content {
+            width: 45%;
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--border);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+        .timeline-content:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--primary);
+        }
+        .timeline-year {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            background: #F3F0FF;
+            border-radius: 20px;
+        }
+        .timeline-content h4 {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin: 0.5rem 0;
+            color: var(--text);
+        }
+        .timeline-content p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            line-height: 1.6;
+            margin: 0;
+        }
+        .timeline-dot {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 16px;
+            height: 16px;
+            background: var(--primary);
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px var(--border);
+            z-index: 1;
+        }
+        .timeline-dot::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+        }
+        @media (max-width: 700px) {
+            .timeline::before { left: 20px; }
+            .timeline-item { flex-direction: column !important; margin-bottom: 1.5rem; }
+            .timeline-content { width: calc(100% - 50px); margin-left: 50px; }
+            .timeline-dot { left: 20px; }
+        }
+
+        /* ===== TEAM SECTION ===== */
+        .team-section { padding: 4rem 2rem; background: linear-gradient(180deg, rgba(108, 99, 255, 0.02) 0%, rgba(255, 182, 193, 0.02) 100%); }
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 2rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .team-card {
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 2px solid var(--border);
+            text-align: center;
+            transition: var(--transition);
+            position: relative;
+        }
+        .team-card:hover { 
+            transform: translateY(-8px); 
+            box-shadow: var(--shadow-hover);
+        }
+        .team-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .team-card:hover::before { opacity: 1; }
+        .team-avatar {
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .avatar-purple { background: linear-gradient(135deg, #6C63FF 0%, #9B8FFF 100%); }
+        .avatar-pink   { background: linear-gradient(135deg, #FF6B9D 0%, #FF9AC8 100%); }
+        .avatar-green  { background: linear-gradient(135deg, #2ECC71 0%, #27AE60 100%); }
+        .avatar-yellow { background: linear-gradient(135deg, #F39C12 0%, #E67E22 100%); }
+        .avatar-teal   { background: linear-gradient(135deg, #00BCD4 0%, #0097A7 100%); }
+        .avatar-orange { background: linear-gradient(135deg, #FF9800 0%, #FF6F00 100%); }
+        .team-info { padding: 1.5rem 1.2rem; }
+        .team-info h3 { font-family: var(--font-display); font-size: 1.1rem; font-weight: 900; margin-bottom: 0.4rem; color: var(--text); }
+        .team-role { 
+            font-size: 0.85rem; 
+            color: white;
+            font-weight: 800; 
+            margin-bottom: 0.8rem;
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            background: var(--primary);
+        }
+        .team-desc { font-size: 0.82rem; color: var(--text-muted); font-weight: 600; line-height: 1.6; }
+
+        /* ===== TECH SECTION ===== */
+        .tech-section {
+            background: var(--text);
+            color: white;
+            padding: 4rem 2rem;
+        }
+        .tech-section .section-header h2 { color: white; }
+        .tech-section .section-header p { color: rgba(255,255,255,0.65); }
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .tech-item {
+            background: rgba(255,255,255,0.07);
+            border: 1.5px solid rgba(255,255,255,0.12);
+            border-radius: var(--radius-sm);
+            padding: 1.4rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: var(--transition);
+        }
+        .tech-item:hover { background: rgba(255,255,255,0.13); transform: translateY(-3px); }
+        .tech-icon { font-size: 2rem; flex-shrink: 0; }
+        .tech-item h4 { font-size: 0.92rem; font-weight: 800; margin-bottom: 0.2rem; }
+        .tech-item p { font-size: 0.78rem; color: rgba(255,255,255,0.6); font-weight: 600; }
+
+        /* ===== CTA SECTION ===== */
+        .cta-section {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+        .cta-section h2 { font-family: var(--font-display); font-size: 2rem; font-weight: 900; margin-bottom: 0.8rem; }
+        .cta-section p { font-size: 1rem; opacity: 0.9; font-weight: 600; max-width: 500px; margin: 0 auto 2rem; }
+        .cta-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+        @media (max-width: 700px) {
+            .story-inner { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== NAVBAR ===== -->
+    <header class="navbar" id="navbar">
+        <div class="nav-logo">
+            <span class="logo-icon">🧠</span>
+            <span class="logo-text">Bright<strong>Minds</strong></span>
+        </div>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="courses.html"><i class="fas fa-book-open"></i> Courses</a></li>
+                <li><a href="games.html"><i class="fas fa-gamepad"></i> Games</a></li>
+                <li><a href="assessment.html"><i class="fas fa-brain"></i> AI Assessment</a></li>
+                <li><a href="chatbot.html"><i class="fas fa-robot"></i> AI Tutor</a></li>
+                <li><a href="disability.html"><i class="fas fa-heart"></i> Awareness</a></li>
+                <li><a href="about.html" class="active"><i class="fas fa-users"></i> About</a></li>
+            </ul>
+        </nav>
+        <button class="hamburger" id="hamburger"><i class="fas fa-bars"></i></button>
+    </header>
+
+    <!-- ===== HERO ===== -->
+    <div class="page-hero" style="background: linear-gradient(135deg, #6C63FF 0%, #4B44CC 100%);">
+        <h1>👥 About Bright Minds</h1>
+        <p>We believe that every child, regardless of how they learn, deserves an education that sees them, supports them, and helps them shine.</p>
+    </div>
+
+    <!-- ===== MISSION ===== -->
+    <div class="mission-section">
+        <div class="section-header">
+            <span class="section-tag">Our Mission</span>
+            <h2>Learning Without <em>Limits</em></h2>
+        </div>
+        <p>
+            Bright Minds was built with one core belief: <strong>no child is unteachable.</strong> Traditional education often overlooks children with Autism, ADHD, Dyslexia, and slow learning differences. We set out to change that — by creating an adaptive, compassionate, AI-powered platform that meets every child exactly where they are.
+        </p>
+    </div>
+
+    <!-- ===== VALUES ===== -->
+    <div class="container">
+        <div class="values-grid">
+            <div class="value-card">
+                <div class="value-icon">🌈</div>
+                <h3>Inclusivity First</h3>
+                <p>Every feature, every lesson, every game on this platform is designed with neurodiversity in mind — not as an afterthought, but as the foundation.</p>
+            </div>
+            <div class="value-card">
+                <div class="value-icon">🤖</div>
+                <h3>Enhanced AI Engine</h3>
+                <p>Our intelligent AI tutor understands natural language, detects moods, and provides personalized responses with direct links to features.</p>
+            </div>
+            <div class="value-card">
+                <div class="value-icon">🎮</div>
+                <h3>Learning is Fun</h3>
+                <p>We use games, rewards, and interactive challenges because when children enjoy what they're doing, they learn faster and remember longer.</p>
+            </div>
+            <div class="value-card">
+                <div class="value-icon">💛</div>
+                <h3>Empathy at the Core</h3>
+                <p>We work with educators, child psychologists, and parents to ensure everything we build respects and celebrates every learner's journey.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== OUR STORY ===== -->
+    <div class="story-section">
+        <div class="story-inner">
+            <div class="story-text">
+                <h2>Our <em>Story</em></h2>
+                <p>Bright Minds began with a question: <em>Why do so many bright children fall through the cracks of standard education systems?</em></p>
+                <p>We saw first-hand how children with different learning needs were often labeled "slow" or "difficult" — when in reality, they simply needed a different door into the world of learning.</p>
+                <p>So we built that door. We combined modern AI technology with research-backed pedagogy, gamification, and compassionate design to create a space where every child can succeed, grow, and feel proud of what they've achieved.</p>
+                <p>Today, Bright Minds serves learners across multiple learning profiles featuring an Enhanced AI Tutor, adaptive assessments, educational games, and comprehensive disability awareness resources — and we're just getting started.</p>
+            </div>
+            <div class="story-visual">
+                <div class="story-stat-card">
+                    <div class="story-stat-num">500+</div>
+                    <div class="story-stat-label">Learning activities across Math, English & General Knowledge</div>
+                </div>
+                <div class="story-stat-card">
+                    <div class="story-stat-num">Enhanced AI</div>
+                    <div class="story-stat-label">Natural language understanding with mood detection</div>
+                </div>
+                <div class="story-stat-card">
+                    <div class="story-stat-num">4</div>
+                    <div class="story-stat-label">Learning differences supported: Autism, ADHD, Dyslexia & Slow Learning</div>
+                </div>
+                <div class="story-stat-card">
+                    <div class="story-stat-num">∞</div>
+                    <div class="story-stat-label">Possibilities when every child gets the support they deserve</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== KEY MILESTONES TIMELINE ===== -->
+    <div class="milestones-section">
+        <div class="section-header">
+            <span class="section-tag">Our Journey</span>
+            <h2>Key <em>Milestones</em></h2>
+            <p>Every step forward is a victory for inclusive education</p>
+        </div>
+        <div class="timeline">
+            <div class="timeline-item left">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-year">🎯 Phase 1</div>
+                    <h4>Foundation & Core Platform</h4>
+                    <p>Built the initial platform with rule-based AI, comprehensive courses in Math, English, and GK, and basic assessment features.</p>
+                </div>
+            </div>
+            <div class="timeline-item right">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-year">🤖 Phase 2</div>
+                    <h4>Enhanced AI Integration</h4>
+                    <p>Upgraded to Enhanced AI with natural language understanding, mood detection, personalized responses, and direct feature links.</p>
+                </div>
+            </div>
+            <div class="timeline-item left">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-year">🎮 Phase 3</div>
+                    <h4>Gamification Launch</h4>
+                    <p>Added three educational games: Memory Match for focus, Word Scramble for spelling, and Pattern Play for cognitive thinking.</p>
+                </div>
+            </div>
+            <div class="timeline-item right">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-year">💙 Phase 4</div>
+                    <h4>Disability Awareness Hub</h4>
+                    <p>Launched comprehensive resources for ADHD, Autism, Dyslexia, and slow learning to support parents and educators.</p>
+                </div>
+            </div>
+            <div class="timeline-item left">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-year">🚀 Phase 5</div>
+                    <h4>Future Roadmap</h4>
+                    <p>Planned features: Voice interaction, multi-language support, parent dashboard, progress tracking, and personalized learning paths.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TEAM ===== -->
+    <div class="team-section">
+        <div class="section-header">
+            <span class="section-tag">The Team</span>
+            <h2>The People Behind <em>Bright Minds</em></h2>
+            <p>A passionate group of educators, developers, and advocates who care deeply about inclusive learning.</p>
+        </div>
+        <div class="team-grid">
+            <div class="team-card">
+                <div class="team-avatar avatar-purple">👩‍💻</div>
+                <div class="team-info">
+                    <h3>Thanushree H J</h3>
+                    <div class="team-role">💻 Founder & Lead Developer</div>
+                    <div class="team-desc">Architected Bright Minds from the ground up. Full-stack developer passionate about building accessible tech that transforms how neurodivergent children learn.</div>
+                </div>
+            </div>
+            <div class="team-card">
+                <div class="team-avatar avatar-green">👑</div>
+                <div class="team-info">
+                    <h3>Adithi</h3>
+                    <div class="team-role">🎯 Strategic Lead</div>
+                    <div class="team-desc">Visionary leader who shapes our mission and guides the team's direction. Ensures every decision aligns with our commitment to inclusive education.</div>
+                </div>
+            </div>
+            <div class="team-card">
+                <div class="team-avatar avatar-yellow">✨</div>
+                <div class="team-info">
+                    <h3>Dharshini</h3>
+                    <div class="team-role">🎨 UX & Design Lead</div>
+                    <div class="team-desc">Creates beautiful, calm interfaces designed specifically for sensory-conscious and neurodivergent learners. Every pixel serves accessibility.</div>
+                </div>
+            </div>
+            <div class="team-card">
+                <div class="team-avatar avatar-teal">🧠</div>
+                <div class="team-info">
+                    <h3>Richard Roy</h3>
+                    <div class="team-role">📊 AI & Research Specialist</div>
+                    <div class="team-desc">Develops intelligent algorithms and adaptive learning engines grounded in cognitive science and evidence-based educational research.</div>
+                </div>
+            </div>
+            <div class="team-card">
+                <div class="team-avatar avatar-pink">💝</div>
+                <div class="team-info">
+                    <h3>Nandhini</h3>
+                    <div class="team-role">📚 Special Education Researcher</div>
+                    <div class="team-desc">Certified special educator and researcher who curates content while validating learning experiences with classroom-based evidence and best practices.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TECH STACK ===== -->
+    <div class="tech-section">
+        <div class="section-header">
+            <span class="section-tag" style="background:rgba(255,255,255,0.15);">How It's Built</span>
+            <h2>The Technology Behind Bright Minds</h2>
+            <p>Simple, fast, and accessible — no installs required. Works on any device, anywhere.</p>
+        </div>
+        <div class="tech-grid" style="margin-top:2rem;">
+            <div class="tech-item">
+                <div class="tech-icon">🌐</div>
+                <div>
+                    <h4>Pure HTML / CSS / JS</h4>
+                    <p>No frameworks — lightweight and loads instantly on any device or connection.</p>
+                </div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-icon">🤖</div>
+                <div>
+                    <h4>Enhanced AI Engine</h4>
+                    <p>Natural language understanding, mood detection, and personalized responses with direct feature links.</p>
+                </div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-icon">🎮</div>
+                <div>
+                    <h4>Canvas-Based Games</h4>
+                    <p>Memory, word scramble, and pattern games built from scratch for neurodiverse learners.</p>
+                </div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-icon">📱</div>
+                <div>
+                    <h4>Fully Responsive</h4>
+                    <p>Works beautifully on phones, tablets, and desktops — no app download needed.</p>
+                </div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-icon">♿</div>
+                <div>
+                    <h4>Accessibility Focused</h4>
+                    <p>High contrast, readable fonts, and interaction patterns designed for all abilities.</p>
+                </div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-icon">🔒</div>
+                <div>
+                    <h4>Privacy Safe</h4>
+                    <p>No personal data stored. Child-safe by design — no accounts or tracking required.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== CTA ===== -->
+    <div class="cta-section">
+        <h2>Ready to Start the Journey? 🚀</h2>
+        <p>Take the free AI Assessment and discover a personalized learning path built just for your child.</p>
+        <div class="cta-actions">
+            <a href="assessment.html" class="btn btn-outline" style="border-color:white;color:white;">
+                <i class="fas fa-magic"></i> Take AI Assessment
+            </a>
+            <a href="courses.html" class="btn" style="background:white;color:var(--primary);">
+                <i class="fas fa-book-open"></i> Explore Courses
+            </a>
+            <a href="chatbot.html" class="btn" style="background:white;color:var(--primary);">
+                <i class="fas fa-robot"></i> Chat with AI Tutor
+            </a>
+        </div>
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <div class="footer-top">
+            <div class="footer-brand">
+                <span class="logo-icon">🧠</span>
+                <span class="logo-text">Bright<strong>Minds</strong></span>
+                <p>Together, we illuminate the path to learning for every child.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Platform</h4>
+                <ul>
+                    <li><a href="courses.html">Courses</a></li>
+                    <li><a href="games.html">Games</a></li>
+                    <li><a href="assessment.html">AI Assessment</a></li>
+                    <li><a href="chatbot.html">AI Tutor</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Learn</h4>
+                <ul>
+                    <li><a href="disability.html">Disability Awareness</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2024 Bright Minds. Made with ❤️ for every child.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Hamburger menu
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.querySelector('.nav-links');
+        if (hamburger) {
+            hamburger.addEventListener('click', () => {
+                navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
+            });
+        }
+    </script>
+</body>
+</html>
