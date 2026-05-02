@@ -23,12 +23,3 @@ Bright Minds is an **AI-powered educational platform** designed for children wit
 - pip (Python package manager)
 - Modern web browser
 
-### Installation
-
-1. **Clone or download the project**
-
-2. **Run the startup script** (choose one):
-
-   **Windows:**
-   ```bash
-   run.bat
